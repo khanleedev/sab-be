@@ -4,20 +4,22 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Data
 @Getter
 @Setter
 public class UploadItemProductForm {
     private String name;
     private int quantity;
-    private double price;
+    private BigDecimal price;
     private String description;
     private Integer maxPurchasePerAccount;
 
     public UploadItemProductForm() {
     }
 
-    public UploadItemProductForm(String name, int quantity, double price, String description) {
+    public UploadItemProductForm(String name, int quantity, BigDecimal price, String description) {
         this.name = name;
         this.quantity = quantity;
         this.price = price;
@@ -40,11 +42,11 @@ public class UploadItemProductForm {
         this.quantity = quantity;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

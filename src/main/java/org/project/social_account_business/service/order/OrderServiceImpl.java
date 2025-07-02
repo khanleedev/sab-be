@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service("orderService")
@@ -54,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         val account = accountService.findById(createOrderForm.getAccountId());
-        double totalPrice = ticketProduct.getPrice() * createOrderForm.getQuantity();
+        double totalPrice = ticketProduct.getPrice().doubleValue() * createOrderForm.getQuantity();
 
         if (account.getBalance() < totalPrice) {
             throw new BadRequestException("[OrderService] Not enough balance", ErrorCode.ACOUNT_NOT_ENOUGH_BALANCE);

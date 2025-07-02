@@ -1,5 +1,6 @@
 package org.project.social_account_business.mapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-01T17:36:34+0700",
+    date = "2025-07-02T21:59:49+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
 )
 @Component
@@ -33,7 +34,9 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         ticketProduct.name( createTicketProductForm.getName() );
         ticketProduct.description( createTicketProductForm.getDescription() );
         ticketProduct.quantity( createTicketProductForm.getQuantity() );
-        ticketProduct.price( createTicketProductForm.getPrice() );
+        if ( createTicketProductForm.getPrice() != null ) {
+            ticketProduct.price( BigDecimal.valueOf( createTicketProductForm.getPrice() ) );
+        }
         ticketProduct.maxPurchasePerAccount( createTicketProductForm.getMaxPurchasePerAccount() );
 
         return ticketProduct.build();
@@ -52,7 +55,7 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         ticketProductDto.setDescription( ticketProduct.getDescription() );
         ticketProductDto.setQuantity( ticketProduct.getQuantity() );
         if ( ticketProduct.getPrice() != null ) {
-            ticketProductDto.setPrice( ticketProduct.getPrice().longValue() );
+            ticketProductDto.setPrice( ticketProduct.getPrice().doubleValue() );
         }
         ticketProductDto.setItemCode( ticketProduct.getItemCode() );
         ticketProductDto.setTicket( ticketToTicketDto( ticketProduct.getTicket() ) );
@@ -80,7 +83,7 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         shortenTicketProductDto.setId( ticketProduct.getId() );
         shortenTicketProductDto.setName( ticketProduct.getName() );
         if ( ticketProduct.getPrice() != null ) {
-            shortenTicketProductDto.setPrice( String.valueOf( ticketProduct.getPrice() ) );
+            shortenTicketProductDto.setPrice( ticketProduct.getPrice().doubleValue() );
         }
         shortenTicketProductDto.setItemCode( ticketProduct.getItemCode() );
 
@@ -117,7 +120,7 @@ public class TicketProductMapperImpl implements TicketProductMapper {
             ticketProduct.setQuantity( updateTicketProductForm.getQuantity() );
         }
         if ( updateTicketProductForm.getPrice() != null ) {
-            ticketProduct.setPrice( updateTicketProductForm.getPrice().doubleValue() );
+            ticketProduct.setPrice( BigDecimal.valueOf( updateTicketProductForm.getPrice() ) );
         }
         if ( updateTicketProductForm.getMaxPurchasePerAccount() != null ) {
             ticketProduct.setMaxPurchasePerAccount( updateTicketProductForm.getMaxPurchasePerAccount() );

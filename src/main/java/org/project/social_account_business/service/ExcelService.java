@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +48,7 @@ public class ExcelService {
         Map<Integer, Consumer<Cell>> cellMapping = new HashMap<>();
         cellMapping.put(0, cell -> uploadItemProductForm.setName(cell.getStringCellValue()));
         cellMapping.put(1, cell -> uploadItemProductForm.setDescription(cell.getStringCellValue()));
-        cellMapping.put(2, cell -> uploadItemProductForm.setPrice(cell.getNumericCellValue()));
+        cellMapping.put(2, cell -> uploadItemProductForm.setPrice(BigDecimal.valueOf(cell.getNumericCellValue())));
         cellMapping.put(3, cell -> uploadItemProductForm.setQuantity((int) cell.getNumericCellValue()));
         cellMapping.put(4, cell -> uploadItemProductForm.setMaxPurchasePerAccount((int) cell.getNumericCellValue()));
         return cellMapping;
