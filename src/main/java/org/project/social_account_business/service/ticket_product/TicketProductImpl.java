@@ -106,7 +106,7 @@ public class TicketProductImpl implements TicketProductService {
                     }
                     TicketProduct ticketProduct = new TicketProduct();
                     ticketProduct.setName(uploadItemProductForm.getName());
-                    ticketProduct.setQuantity(uploadItemProductForm.getQuantity());
+//                    ticketProduct.setQuantity(uploadItemProductForm.getQuantity());
                     ticketProduct.setPrice(uploadItemProductForm.getPrice());
                     ticketProduct.setDescription(uploadItemProductForm.getDescription());
                     ticketProduct.setTicket(ticketService.findTicketById(ticketId));

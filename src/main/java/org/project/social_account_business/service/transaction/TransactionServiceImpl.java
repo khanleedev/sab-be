@@ -50,7 +50,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     @Transactional
-    public String createTransactionForOrder(Order order) {
+    public String createTransactionForOrder(Order order, List<TicketProductInfo> ticketProductInfos) {
         val transaction = new Transaction();
         val coinAmount = order.getTotalPrice();
         transaction.setTransactionId(order.getId());
@@ -63,7 +63,7 @@ public class TransactionServiceImpl implements TransactionService {
         transactionRepository.save(transaction);
         String username = order.getAccount().getAccountName();
         String email = order.getAccount().getEmail();
-        String message = emailService.getEmailOrderCompleteTemplate(username, transactionCode, order.getTotalPrice(), order.getCreatedDate(), TransactionStatus.PAID.toString().toLowerCase(), order.getTicketProduct().getName(), order.getQuantity(), order.getTicketProduct().getItemCode());
+        String message = emailService.getEmailOrderCompleteTemplate(username, transactionCode, order.getTotalPrice(), order.getCreatedDate(), TransactionStatus.PAID.toString().toLowerCase(), order.getTicketProduct().getName(), order.getQuantity(), order.getTicketProduct().getItemCode(), ticketProductInfos);
         emailService.sendEmail(email, "Order Confirmation", message, true);
         return transactionCode;
     }

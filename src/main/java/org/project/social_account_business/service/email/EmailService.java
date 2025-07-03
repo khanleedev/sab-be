@@ -1,8 +1,10 @@
 package org.project.social_account_business.service.email;
 
+import org.project.social_account_business.model.TicketProductInfo;
 import org.springframework.scheduling.annotation.Async;
 
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface EmailService {
@@ -67,7 +69,8 @@ public interface EmailService {
      * @param ticketProductItemCode the item code of the ticket product
      * @return the order completion email template as a string
      */
-    String getEmailOrderCompleteTemplate(String name, String transactionCode, Double amountInCoin, Date time, String transactionStatus, String ticketProductName, Integer quantity, String ticketProductItemCode);
+    String getEmailOrderCompleteTemplate(String name, String transactionCode, Double amountInCoin, Date time, String transactionStatus, String ticketProductName, Integer quantity, String ticketProductItemCode,
+                                         List<TicketProductInfo> randomInfos);
 
 
     String getEmailApologizeForBalanceErrorTemplate(String name, String transactionCode, double amount, Date correctionTime);

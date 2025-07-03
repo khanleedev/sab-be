@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.project.social_account_business.model.TicketProduct;
+import org.project.social_account_business.model.TicketProductInfo;
 import org.project.social_account_business.service.OTPService;
 import org.project.social_account_business.service.currency.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,7 +148,40 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String getEmailOrderCompleteTemplate(String name, String transactionCode, Double amountInCoin, Date time, String transactionStatus, String ticketProductName, Integer quantity, String ticketProductItemCode) {
+    public String getEmailOrderCompleteTemplate(String name,
+                                                String transactionCode,
+                                                Double amountInCoin,
+                                                Date time,
+                                                String transactionStatus,
+                                                String ticketProductName,
+                                                Integer quantity,
+                                                String ticketProductItemCode,
+                                                List<TicketProductInfo> randomInfos) {
+        StringBuilder tableBuilder = new StringBuilder();
+        tableBuilder.append("<h3 style=\"margin-top: 30px; color: #333;\">Purchased Account Info</h3>");
+        tableBuilder.append("<table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">");
+        tableBuilder.append("<thead><tr style=\"background-color: #f2f2f2; text-align: left;\">")
+                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">UID</th>")
+                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">PASS</th>")
+                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">2FA</th>")
+                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">MAIL</th>")
+                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">PASS MAIL</th>")
+                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">MAIL VERIFY</th>")
+                .append("</tr></thead><tbody>");
+
+        for (TicketProductInfo info : randomInfos) {
+            tableBuilder.append("<tr>")
+                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getUid()).append("</td>")
+                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getPass()).append("</td>")
+                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getTwoFA() == null ? "-" : info.getTwoFA()).append("</td>")
+                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getMail() == null ? "-" : info.getMail()).append("</td>")
+                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getPassMail() == null ? "-" : info.getPassMail()).append("</td>")
+                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getMailVerify() == null ? "-" : info.getMailVerify()).append("</td>")
+                    .append("</tr>");
+        }
+
+        tableBuilder.append("</tbody></table>");
+
         return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
                 + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
                 + "<div style=\"text-align: center; padding-bottom: 20px;\">"
@@ -161,22 +195,23 @@ public class EmailServiceImpl implements EmailService {
                 + "<li><strong>Transaction ID: </strong> " + transactionCode + "</li>"
                 + "<li><strong>Amount: </strong> " + amountInCoin + "</li>"
                 + "<li><strong>Order time: </strong> " + time + "</li>"
-                + "<li><strong>Order item: </strong> " + ticketProductName + "&nbsp;&nbsp;&nbsp;" + "<span style\"color:blue; font-weight: bold;\">" + quantity + "</span></li>"
+                + "<li><strong>Order item: </strong> " + ticketProductName + "&nbsp;&nbsp;&nbsp;"
+                + "<span style=\"color:blue; font-weight: bold;\">" + quantity + "</span></li>"
                 + "<li><strong>Item code: </strong> " + ticketProductItemCode + "</li>"
                 + "<li><strong>Order status:</strong> <span style=\"color: green; font-weight: bold;\">" + transactionStatus + "</span></li>"
+                + "<li><strong>Item details: </strong></li>"
                 + "</ul>"
+                + tableBuilder
                 + "<p>Thanks for choosing our service.</p>"
-                + "<div style=\"text-align: center; margin-top: 30px;\">"
-                + "</div>"
                 + "</div>"
                 + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 30px 0;\" />"
                 + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
                 + "<p>📧 Any confusion please contact by this email:</p>"
                 + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #3f51b5; text-decoration: none;\">" + fromEmail + "</a></p>"
                 + "</div>"
-                + "</div>"
-                + "</div>";
+                + "</div></div>";
     }
+
 
     @Override
     public String getEmailApologizeForBalanceErrorTemplate(String name, String transactionCode, double amount, Date correctionTime) {

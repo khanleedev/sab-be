@@ -6,6 +6,7 @@ import org.project.social_account_business.dto.transaction.TransactionForOrderDt
 import org.project.social_account_business.dto.transaction.TransactionForPaymentDto;
 import org.project.social_account_business.form.payment_transaction.CreateTopUpForm;
 import org.project.social_account_business.model.Order;
+import org.project.social_account_business.model.TicketProductInfo;
 import org.project.social_account_business.model.Transaction;
 import org.project.social_account_business.model.criteria.TransactionCriteria;
 import org.springframework.data.domain.Pageable;
@@ -19,7 +20,7 @@ public interface TransactionService {
      * @param order the order for which the transaction is created
      * @return the created transaction
      */
-    String createTransactionForOrder(Order order);
+    String createTransactionForOrder(Order order, List<TicketProductInfo> ticketProductInfos);
 
     /**
      * Create a new payment transaction.

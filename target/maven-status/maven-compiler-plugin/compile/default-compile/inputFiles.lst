@@ -84,6 +84,9 @@ D:\New folder\social_account_business\src\main\java\org\project\social_account_b
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\ticket\UpdateTicketForm.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\ticket_product\CreateTicketProductForm.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\ticket_product\UpdateTicketProductForm.java
+D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\ticket_product_info\CreateTicketProductInfoForm.java
+D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\ticket_product_info\UpdateTicketProductInfoForm.java
+D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\ticket_product_info\UploadTicketProductInfoForm.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\transaction\CreateTransactionForm.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\transaction\CreateTransactionForOrderForm.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\form\transaction\CreateTransactionForPaymentForm.java

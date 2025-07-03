@@ -49,4 +49,5 @@ public class ErrorCode {
     public static final String REPORT_NOT_FOUND = "REPORT_ERROR_0001";
     // Currency Error Codes
     public static final String CURRENCY_NOT_FOUND = "CURRENCY_ERROR_0001";
+    public static final String TICKET_PRODUCT_INFO_NOT_ENOUGH = "TICKET_PRODUCT_INFO_ERROR_0001";
 }
