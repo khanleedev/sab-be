@@ -176,6 +176,7 @@ public class TicketProductController extends ABasicController {
                 .mail(createTicketProductInfoForm.getMail())
                 .passMail(createTicketProductInfoForm.getPassMail())
                 .mailVerify(createTicketProductInfoForm.getMailVerify())
+                .isSold(false)
                 .build();
 
         // 3. Lưu vào DB
@@ -269,6 +270,7 @@ public class TicketProductController extends ABasicController {
                         .mail(form.getMail())
                         .passMail(form.getPassMail())
                         .mailVerify(form.getMailVerify())
+                        .isSold(false)
                         .build())
                 .toList();
 
