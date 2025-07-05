@@ -6,8 +6,10 @@ import lombok.val;
 import org.project.social_account_business.dto.ApiResponse;
 import org.project.social_account_business.dto.ResponseListDto;
 import org.project.social_account_business.dto.order.OrderDto;
+import org.project.social_account_business.dto.ticket_product_info.TicketProductInfoDto;
 import org.project.social_account_business.exception.MyBindingException;
 import org.project.social_account_business.form.order.CreateOrderForm;
+import org.project.social_account_business.mapper.TicketProductMapper;
 import org.project.social_account_business.model.TicketProductInfo;
 import org.project.social_account_business.model.criteria.OrderCriteria;
 import org.project.social_account_business.service.order.OrderService;
@@ -28,15 +30,17 @@ import java.util.Objects;
 @Slf4j
 public class OrderController extends ABasicController{
     final OrderService orderService;
+    final TicketProductMapper ticketProductMapper;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, TicketProductMapper ticketProductMapper) {
         this.orderService = orderService;
+        this.ticketProductMapper = ticketProductMapper;
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     @PreAuthorize("hasRole('ROLE_USER')")
-    public ResponseEntity<ApiResponse<List<TicketProductInfo>>> createOrder(@RequestBody @Valid CreateOrderForm createOrderForm, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse<List<TicketProductInfoDto>>> createOrder(@RequestBody @Valid CreateOrderForm createOrderForm, BindingResult bindingResult) {
         log.info("Creating order");
         if (bindingResult.hasErrors()) {
             if (bindingResult.hasErrors()) {
@@ -44,7 +48,7 @@ public class OrderController extends ABasicController{
             }
         }
         val infos = orderService.createOrder(createOrderForm);
-        return ResponseEntity.ok().body(new ApiResponse<>(HttpStatus.CREATED, "Order created successfully", infos));
+        return ResponseEntity.ok().body(new ApiResponse<>(HttpStatus.CREATED, "Order created successfully", ticketProductMapper.fromEntitiesToTicketProductInfoDtos(infos)));
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
