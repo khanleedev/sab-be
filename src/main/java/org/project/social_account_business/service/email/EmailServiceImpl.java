@@ -157,6 +157,7 @@ public class EmailServiceImpl implements EmailService {
                                                 Integer quantity,
                                                 String ticketProductItemCode,
                                                 List<TicketProductInfo> randomInfos) {
+        log.info("[EmailService] Generating order confirmation email for user: {}", name);
         StringBuilder tableBuilder = new StringBuilder();
         tableBuilder.append("<h3 style=\"margin-top: 30px; color: #333;\">Purchased Account Info</h3>");
         tableBuilder.append("<table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">");
@@ -181,6 +182,8 @@ public class EmailServiceImpl implements EmailService {
         }
 
         tableBuilder.append("</tbody></table>");
+        log.info("[EmailService] Order confirmation email generated successfully for user: {}", name);
+        log.info("info: " + tableBuilder);
 
         return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
                 + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"

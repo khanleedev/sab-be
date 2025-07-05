@@ -64,6 +64,7 @@ public class TransactionServiceImpl implements TransactionService {
         String username = order.getAccount().getAccountName();
         String email = order.getAccount().getEmail();
         String message = emailService.getEmailOrderCompleteTemplate(username, transactionCode, order.getTotalPrice(), order.getCreatedDate(), TransactionStatus.PAID.toString().toLowerCase(), order.getTicketProduct().getName(), order.getQuantity(), order.getTicketProduct().getItemCode(), ticketProductInfos);
+        log.info("[TransactionService] Sending order confirmation email to: {}", email);
         emailService.sendEmail(email, "Order Confirmation", message, true);
         return transactionCode;
     }
