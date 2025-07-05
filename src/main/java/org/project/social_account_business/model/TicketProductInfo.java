@@ -3,6 +3,7 @@ package org.project.social_account_business.model;
 import jakarta.persistence.*;
 import lombok.*;
 import org.project.social_account_business.validation.SystemId;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = TablePrefix.PREFIX + "ticket_product_infos")
@@ -11,6 +12,7 @@ import org.project.social_account_business.validation.SystemId;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EntityListeners(AuditingEntityListener.class)
 public class TicketProductInfo extends Auditable<String>{
 
     @Id
