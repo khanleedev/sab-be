@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -41,6 +42,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(text, html);
+            helper.setFrom(fromEmail);
             mailSender.send(message);
 
             log.info("Sent email to {}", to);
@@ -157,63 +159,61 @@ public class EmailServiceImpl implements EmailService {
                                                 Integer quantity,
                                                 String ticketProductItemCode,
                                                 List<TicketProductInfo> randomInfos) {
-        log.info("[EmailService] Generating order confirmation email for user: {}", name);
-        StringBuilder tableBuilder = new StringBuilder();
-        tableBuilder.append("<h3 style=\"margin-top: 30px; color: #333;\">Purchased Account Info</h3>");
-        tableBuilder.append("<table style=\"width: 100%; border-collapse: collapse; font-size: 14px;\">");
-        tableBuilder.append("<thead><tr style=\"background-color: #f2f2f2; text-align: left;\">")
-                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">UID</th>")
-                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">PASS</th>")
-                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">2FA</th>")
-                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">MAIL</th>")
-                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">PASS MAIL</th>")
-                .append("<th style=\"padding: 8px; border: 1px solid #ddd;\">MAIL VERIFY</th>")
-                .append("</tr></thead><tbody>");
 
-        for (TicketProductInfo info : randomInfos) {
-            tableBuilder.append("<tr>")
-                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getUid()).append("</td>")
-                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getPass()).append("</td>")
-                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getTwoFA() == null ? "-" : info.getTwoFA()).append("</td>")
-                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getMail() == null ? "-" : info.getMail()).append("</td>")
-                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getPassMail() == null ? "-" : info.getPassMail()).append("</td>")
-                    .append("<td style=\"padding: 8px; border: 1px solid #ddd;\">").append(info.getMailVerify() == null ? "-" : info.getMailVerify()).append("</td>")
-                    .append("</tr>");
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">")
+                .append("<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">")
+                .append("<div style=\"text-align: center; padding-bottom: 20px;\">")
+                .append("<img src=\"https://cdn-icons-png.flaticon.com/512/845/845646.png\" alt=\"Success\" style=\"width: 80px;\">")
+                .append("<h1 style=\"font-size: 1.8em; color: #2ecc71; margin: 20px 0;\">ORDER CONFIRMATION SUCCESS!</h1>")
+                .append("</div>")
+
+                .append("<div style=\"padding: 0 20px; font-size: 1em; color: #333;\">")
+                .append("<p><strong>Hi ").append(name).append(",</strong></p>")
+                .append("<p>Your order confirmation: </p>")
+                .append("<ul style=\"list-style: none; padding-left: 0; color: #555;\">")
+                .append("<li><strong>Transaction ID: </strong> ").append(transactionCode).append("</li>")
+                .append("<li><strong>Amount: </strong> ").append(amountInCoin).append("</li>")
+                .append("<li><strong>Order time: </strong> ").append(time).append("</li>")
+                .append("<li><strong>Order item: </strong> ").append(ticketProductName).append("&nbsp;&nbsp;&nbsp;<span style='color:blue; font-weight: bold;'>").append(quantity).append("</span></li>")
+                .append("<li><strong>Item code: </strong> ").append(ticketProductItemCode).append("</li>")
+                .append("<li><strong>Order status:</strong> <span style='color: green; font-weight: bold;'>").append(transactionStatus).append("</span></li>")
+                .append("<li><strong>Item details: </strong></li>")
+                .append("</ul>");
+
+        if (randomInfos != null && !randomInfos.isEmpty()) {
+            builder.append("<div style='margin-top: 10px;'>")
+                    .append("<p style='font-weight: bold;'>Item information:</p>")
+                    .append("<pre style='background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 4px; overflow-x: auto; font-size: 14px;'>")
+                    .append("UID | PASS | 2FA | MAIL | PASS MAIL | MAIL VERIFY\n");
+
+            for (TicketProductInfo info : randomInfos) {
+                builder.append(String.format("%s | %s | %s | %s | %s | %s\n",
+                        Optional.ofNullable(info.getUid()).orElse(""),
+                        Optional.ofNullable(info.getPass()).orElse(""),
+                        Optional.ofNullable(info.getTwoFA()).orElse(""),
+                        Optional.ofNullable(info.getMail()).orElse(""),
+                        Optional.ofNullable(info.getPassMail()).orElse(""),
+                        Optional.ofNullable(info.getMailVerify()).orElse("")
+                ));
+            }
+
+            builder.append("</pre></div>");
         }
 
-        tableBuilder.append("</tbody></table>");
-        log.info("[EmailService] Order confirmation email generated successfully for user: {}", name);
-        log.info("info: " + tableBuilder);
+        builder.append("<p>Thanks for choosing our service.</p>")
+                .append("</div>")
+                .append("<hr style=\"border: none; border-top: 1px solid #ddd; margin: 30px 0;\" />")
+                .append("<div style=\"text-align: center; font-size: 0.9em; color: #888;\">")
+                .append("<p>📧 Any confusion please contact by this email:</p>")
+                .append("<p>Email: <a href=\"mailto:").append(fromEmail).append("\" style=\"color: #3f51b5; text-decoration: none;\">").append(fromEmail).append("</a></p>")
+                .append("</div>")
+                .append("</div></div>");
 
-        return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
-                + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
-                + "<div style=\"text-align: center; padding-bottom: 20px;\">"
-                + "<img src=\"https://cdn-icons-png.flaticon.com/512/845/845646.png\" alt=\"Success\" style=\"width: 80px;\">"
-                + "<h1 style=\"font-size: 1.8em; color: #2ecc71; margin: 20px 0;\">ORDER CONFIRMATION SUCCESS!</h1>"
-                + "</div>"
-                + "<div style=\"padding: 0 20px; font-size: 1em; color: #333;\">"
-                + "<p><strong>Hi " + name + ",</strong></p>"
-                + "<p>Your order confirmation: </p>"
-                + "<ul style=\"list-style: none; padding-left: 0; color: #555;\">"
-                + "<li><strong>Transaction ID: </strong> " + transactionCode + "</li>"
-                + "<li><strong>Amount: </strong> " + amountInCoin + "</li>"
-                + "<li><strong>Order time: </strong> " + time + "</li>"
-                + "<li><strong>Order item: </strong> " + ticketProductName + "&nbsp;&nbsp;&nbsp;"
-                + "<span style=\"color:blue; font-weight: bold;\">" + quantity + "</span></li>"
-                + "<li><strong>Item code: </strong> " + ticketProductItemCode + "</li>"
-                + "<li><strong>Order status:</strong> <span style=\"color: green; font-weight: bold;\">" + transactionStatus + "</span></li>"
-                + "<li><strong>Item details: </strong></li>"
-                + "</ul>"
-                + tableBuilder
-                + "<p>Thanks for choosing our service.</p>"
-                + "</div>"
-                + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 30px 0;\" />"
-                + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
-                + "<p>📧 Any confusion please contact by this email:</p>"
-                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #3f51b5; text-decoration: none;\">" + fromEmail + "</a></p>"
-                + "</div>"
-                + "</div></div>";
+        return builder.toString();
     }
+
 
 
     @Override
