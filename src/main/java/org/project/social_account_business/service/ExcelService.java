@@ -45,43 +45,72 @@ public class ExcelService {
                 && row.getCell(3).getStringCellValue().equals(ITEMS[3]);
     }
 
-    private Map<Integer, Consumer<Cell>> createItemCellMapping(UploadItemProductForm uploadItemProductForm) {
-        Map<Integer, Consumer<Cell>> cellMapping = new HashMap<>();
-        cellMapping.put(0, cell -> uploadItemProductForm.setName(cell.getStringCellValue()));
-        cellMapping.put(1, cell -> uploadItemProductForm.setDescription(cell.getStringCellValue()));
-        cellMapping.put(2, cell -> {
-            if (cell.getCellType() == CellType.NUMERIC) {
-                uploadItemProductForm.setPrice(BigDecimal.valueOf(cell.getNumericCellValue()));
-            } else if (cell.getCellType() == CellType.STRING) {
-                uploadItemProductForm.setPrice(new BigDecimal(cell.getStringCellValue()));
-            }
-        });
+    private String getCellString(Cell cell) {
+        if (cell.getCellType() == CellType.STRING) {
+            return cell.getStringCellValue().trim();
+        } else if (cell.getCellType() == CellType.NUMERIC) {
+            return String.valueOf(cell.getNumericCellValue());
+        }
+        return "";
+    }
 
-//        cellMapping.put(3, cell -> uploadItemProductForm.setQuantity(Integer.parseInt(cell.getStringCellValue())));
-        cellMapping.put(3, cell -> uploadItemProductForm.setMaxPurchasePerAccount(Integer.parseInt(cell.getStringCellValue())));
-        return cellMapping;
+    private BigDecimal getCellBigDecimal(Cell cell) {
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return BigDecimal.valueOf(cell.getNumericCellValue());
+        } else if (cell.getCellType() == CellType.STRING) {
+            try {
+                return new BigDecimal(cell.getStringCellValue().trim());
+            } catch (NumberFormatException e) {
+                throw new BadRequestException("Invalid decimal format: " + cell.getStringCellValue());
+            }
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private int getCellInt(Cell cell) {
+        if (cell.getCellType() == CellType.NUMERIC) {
+            return (int) cell.getNumericCellValue();
+        } else if (cell.getCellType() == CellType.STRING) {
+            try {
+                return Integer.parseInt(cell.getStringCellValue().trim());
+            } catch (NumberFormatException e) {
+                throw new BadRequestException("Invalid integer format: " + cell.getStringCellValue());
+            }
+        }
+        return 0;
+    }
+
+
+    private Map<Integer, Consumer<Cell>> createItemCellMapping(UploadItemProductForm form) {
+        Map<Integer, Consumer<Cell>> map = new HashMap<>();
+
+        map.put(0, cell -> form.setName(getCellString(cell)));
+        map.put(1, cell -> form.setDescription(getCellString(cell)));
+        map.put(2, cell -> form.setPrice(getCellBigDecimal(cell)));
+        map.put(3, cell -> form.setMaxPurchasePerAccount(getCellInt(cell)));
+
+        return map;
     }
 
     private UploadItemProductForm createItemUpload(Row row) throws Exception {
-        UploadItemProductForm testCaseUpload = new UploadItemProductForm();
-        try{
-            Map<Integer, Consumer<Cell>> cellMapping = createItemCellMapping(testCaseUpload);
+        UploadItemProductForm form = new UploadItemProductForm();
+        try {
+            Map<Integer, Consumer<Cell>> cellMapping = createItemCellMapping(form);
 
             for (Map.Entry<Integer, Consumer<Cell>> entry : cellMapping.entrySet()) {
                 Cell cell = row.getCell(entry.getKey());
-                if (cell != null && (cell.getCellType() == CellType.STRING || cell.getCellType() == CellType.NUMERIC)) {
+                if (cell != null) {
                     entry.getValue().accept(cell);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new Exception("Failed to parse Excel file.\nError: " + e.getMessage() + "\nAt row num: " + row.getRowNum());
         }
-        return testCaseUpload;
+        return form;
     }
 
     public List<UploadItemProductForm> mapExcelToData(InputStream inputStream) throws Exception {
-        List<UploadItemProductForm> uploadItemProductForms = new ArrayList<>();
-
+        List<UploadItemProductForm> list = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             for (Sheet sheet : workbook) {
                 for (Row row : sheet) {
@@ -91,17 +120,14 @@ public class ExcelService {
                         }
                         continue;
                     }
-
-                    UploadItemProductForm uploadItemProductForm = createItemUpload(row);
-                    uploadItemProductForms.add(uploadItemProductForm);
+                    list.add(createItemUpload(row));
                 }
             }
         } catch (IOException ex) {
             throw new BadRequestException("Failed to parse Excel file.\nError: " + ex.getMessage());
         }
-        return uploadItemProductForms;
+        return list;
     }
-
     public List<UploadTicketProductInfoForm> mapExcelToTicketProductInfos(InputStream inputStream) throws Exception {
         List<UploadTicketProductInfoForm> infoList = new ArrayList<>();
 
