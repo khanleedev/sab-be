@@ -13,12 +13,7 @@ import java.util.List;
 public interface TicketProductInfoRepository extends JpaRepository<TicketProductInfo, Long> , JpaSpecificationExecutor<TicketProductInfo> {
     List<TicketProductInfo> findAllByTicketProductId(Long ticketProductId);
 
-    @Query(value = """
-    SELECT * FROM sab_db_ticket_product_infos 
-    WHERE ticket_product_id = :ticketProductId AND is_sold = false 
-    ORDER BY RANDOM() 
-    LIMIT :limit
-""", nativeQuery = true)
+    @Query("SELECT t FROM TicketProductInfo t WHERE t.ticketProduct.id = :ticketProductId AND t.isSold = false order by t.id ASC LIMIT :limit")
     List<TicketProductInfo> findAvailableRandomInfos(@Param("ticketProductId") Long ticketProductId,
                                                      @Param("limit") int limit);
 
