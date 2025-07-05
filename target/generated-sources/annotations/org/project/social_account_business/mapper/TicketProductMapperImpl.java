@@ -9,15 +9,17 @@ import javax.annotation.processing.Generated;
 import org.project.social_account_business.dto.ticket.TicketDto;
 import org.project.social_account_business.dto.ticket_product.ShortenTicketProductDto;
 import org.project.social_account_business.dto.ticket_product.TicketProductDto;
+import org.project.social_account_business.dto.ticket_product_info.TicketProductInfoDto;
 import org.project.social_account_business.form.ticket_product.CreateTicketProductForm;
 import org.project.social_account_business.form.ticket_product.UpdateTicketProductForm;
 import org.project.social_account_business.model.Ticket;
 import org.project.social_account_business.model.TicketProduct;
+import org.project.social_account_business.model.TicketProductInfo;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-05T10:16:19+0700",
+    date = "2025-07-05T10:53:13+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
 )
 @Component
@@ -125,6 +127,40 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         if ( updateTicketProductForm.getMaxPurchasePerAccount() != null ) {
             ticketProduct.setMaxPurchasePerAccount( updateTicketProductForm.getMaxPurchasePerAccount() );
         }
+    }
+
+    @Override
+    public TicketProductInfoDto fromEntityToTicketProductInfoDto(TicketProductInfo ticketProductInfo) {
+        if ( ticketProductInfo == null ) {
+            return null;
+        }
+
+        TicketProductInfoDto ticketProductInfoDto = new TicketProductInfoDto();
+
+        ticketProductInfoDto.setId( ticketProductInfo.getId() );
+        ticketProductInfoDto.setUid( ticketProductInfo.getUid() );
+        ticketProductInfoDto.setPass( ticketProductInfo.getPass() );
+        ticketProductInfoDto.setTwoFA( ticketProductInfo.getTwoFA() );
+        ticketProductInfoDto.setMail( ticketProductInfo.getMail() );
+        ticketProductInfoDto.setPassMail( ticketProductInfo.getPassMail() );
+        ticketProductInfoDto.setMailVerify( ticketProductInfo.getMailVerify() );
+        ticketProductInfoDto.setIsSold( ticketProductInfo.getIsSold() );
+
+        return ticketProductInfoDto;
+    }
+
+    @Override
+    public List<TicketProductInfoDto> fromEntitiesToTicketProductInfoDtos(List<TicketProductInfo> ticketProductInfos) {
+        if ( ticketProductInfos == null ) {
+            return null;
+        }
+
+        List<TicketProductInfoDto> list = new ArrayList<TicketProductInfoDto>( ticketProductInfos.size() );
+        for ( TicketProductInfo ticketProductInfo : ticketProductInfos ) {
+            list.add( fromEntityToTicketProductInfoDto( ticketProductInfo ) );
+        }
+
+        return list;
     }
 
     protected TicketDto ticketToTicketDto(Ticket ticket) {

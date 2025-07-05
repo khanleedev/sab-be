@@ -9,6 +9,7 @@ import org.project.social_account_business.constant.BetaConstant;
 import org.project.social_account_business.dto.ApiResponse;
 import org.project.social_account_business.dto.ResponseListDto;
 import org.project.social_account_business.dto.ticket_product.TicketProductDto;
+import org.project.social_account_business.dto.ticket_product_info.TicketProductInfoDto;
 import org.project.social_account_business.exception.BadRequestException;
 import org.project.social_account_business.exception.MyBindingException;
 import org.project.social_account_business.exception.NotFoundException;
@@ -17,12 +18,14 @@ import org.project.social_account_business.form.ticket_product.UpdateTicketProdu
 import org.project.social_account_business.form.ticket_product_info.CreateTicketProductInfoForm;
 import org.project.social_account_business.form.ticket_product_info.UpdateTicketProductInfoForm;
 import org.project.social_account_business.form.ticket_product_info.UploadTicketProductInfoForm;
+import org.project.social_account_business.mapper.TicketProductMapper;
 import org.project.social_account_business.model.TicketProductInfo;
 import org.project.social_account_business.model.criteria.TicketProductCriteria;
 import org.project.social_account_business.repository.TicketProductInfoRepository;
 import org.project.social_account_business.service.ExcelService;
 import org.project.social_account_business.service.email.EmailService;
 import org.project.social_account_business.service.ticket_product.TicketProductService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -49,12 +52,14 @@ public class TicketProductController extends ABasicController {
     final TicketProductInfoRepository ticketProductInfoRepository;
     final EmailService emailService;
     final ExcelService excelService;
+    private final TicketProductMapper ticketProductMapper;
 
-    public TicketProductController(TicketProductService ticketProductService, TicketProductInfoRepository ticketProductInfoRepository, EmailService emailService, ExcelService excelService) {
+    public TicketProductController(TicketProductService ticketProductService, TicketProductInfoRepository ticketProductInfoRepository, EmailService emailService, ExcelService excelService, TicketProductMapper ticketProductMapper) {
         this.ticketProductService = ticketProductService;
         this.ticketProductInfoRepository = ticketProductInfoRepository;
         this.emailService = emailService;
         this.excelService = excelService;
+        this.ticketProductMapper = ticketProductMapper;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -188,23 +193,31 @@ public class TicketProductController extends ABasicController {
 
     @GetMapping(value = "/infos", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(readOnly = true)
-    public ResponseEntity<ApiResponse<List<TicketProductInfo>>> getTicketProductInfos(@RequestParam("ticketProductId") Long ticketProductId) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse<ResponseListDto<List<TicketProductInfo>>>> getTicketProductInfos(@RequestParam("ticketProductId") Long ticketProductId, Pageable pageable) {
         log.info("Getting ticket product infos by ticket product ID");
-        List<TicketProductInfo> infos = ticketProductInfoRepository.findAllByTicketProductId(ticketProductId);
-        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Infos retrieved successfully", infos));
+        Page<TicketProductInfo> infos = ticketProductInfoRepository.findAllByTicketProductId(ticketProductId, pageable);
+        ResponseListDto responseListDto = new ResponseListDto(
+                ticketProductMapper.fromEntitiesToTicketProductInfoDtos(infos.getContent()),
+                infos.getTotalElements(),
+                infos.getTotalPages()
+        );
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Infos retrieved successfully", responseListDto));
     }
 
     @GetMapping(value = "/infos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional(readOnly = true)
-    public ResponseEntity<ApiResponse<TicketProductInfo>> getTicketProductInfo(@PathVariable("id") Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse<TicketProductInfoDto>> getTicketProductInfo(@PathVariable("id") Long id) {
         log.info("Getting ticket product info by ID: {}", id);
         TicketProductInfo info = ticketProductInfoRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("TicketProductInfo not found"));
-        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Info retrieved", info));
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Info retrieved", ticketProductMapper.fromEntityToTicketProductInfoDto(info)));
     }
 
     @PutMapping(value = "/infos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<String>> updateTicketProductInfo(@Valid @RequestBody UpdateTicketProductInfoForm form, BindingResult bindingResult) {
         log.info("Updating ticket product info");
         if (bindingResult.hasErrors()) {
@@ -226,6 +239,7 @@ public class TicketProductController extends ABasicController {
 
     @PatchMapping(value = "/infos/soft-delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<String>> softDeleteTicketProductInfo(@PathVariable("id") Long id) {
         log.info("Soft deleting ticket product info with id: {}", id);
         TicketProductInfo info = ticketProductInfoRepository.findById(id)
@@ -240,6 +254,7 @@ public class TicketProductController extends ABasicController {
 
     @DeleteMapping(value = "/infos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public ResponseEntity<ApiResponse<String>> deleteTicketProductInfo(@PathVariable("id") Long id) {
         log.info("Deleting ticket product info with id: {}", id);
         ticketProductInfoRepository.deleteById(id);

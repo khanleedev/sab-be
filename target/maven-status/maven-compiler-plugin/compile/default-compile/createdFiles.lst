@@ -3,6 +3,7 @@ org\project\social_account_business\model\Currency$CurrencyBuilder.class
 org\project\social_account_business\model\criteria\AccountCriteria$1.class
 org\project\social_account_business\mapper\PaymentTransactionMapperImpl.class
 org\project\social_account_business\dto\payment_transaction\PaypalResponseDto.class
+org\project\social_account_business\repository\TicketProductInfoRepository.class
 org\project\social_account_business\form\paypal_order\OrderRequestForm.class
 org\project\social_account_business\mapper\TransactionMapperImpl.class
 org\project\social_account_business\service\auth\AuthService.class
@@ -18,7 +19,9 @@ org\project\social_account_business\form\payment_transaction\PaymentTransactionW
 org\project\social_account_business\model\criteria\OrderCriteria$1.class
 org\project\social_account_business\service\AsyncService.class
 org\project\social_account_business\validation\UserKind.class
+org\project\social_account_business\model\TicketProductInfo.class
 org\project\social_account_business\form\UpdateCurrencyForm.class
+org\project\social_account_business\dto\ticket_product_info\TicketProductInfoDto.class
 org\project\social_account_business\model\Report.class
 org\project\social_account_business\model\TokenInfo$TokenInfoBuilder.class
 org\project\social_account_business\form\paypal_order\OrderResponseForm.class
@@ -92,6 +95,7 @@ org\project\social_account_business\model\Currency.class
 org\project\social_account_business\service\ticket_product\TicketProductImpl.class
 org\project\social_account_business\mapper\PaymentTransactionMapper.class
 org\project\social_account_business\dto\transaction\ShortenTransactionDto.class
+org\project\social_account_business\model\TicketProductInfo$TicketProductInfoBuilder.class
 org\project\social_account_business\model\Report$ReportBuilder.class
 org\project\social_account_business\model\TransactionStatus.class
 org\project\social_account_business\form\payment_transaction\CreateTopUpForm.class

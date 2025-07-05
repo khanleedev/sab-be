@@ -41,6 +41,7 @@ D:\New folder\social_account_business\src\main\java\org\project\social_account_b
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\dto\ticket\TicketDto.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\dto\ticket_product\ShortenTicketProductDto.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\dto\ticket_product\TicketProductDto.java
+D:\New folder\social_account_business\src\main\java\org\project\social_account_business\dto\ticket_product_info\TicketProductInfoDto.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\dto\transaction\ShortenTransactionDto.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\dto\transaction\TransactionDto.java
 D:\New folder\social_account_business\src\main\java\org\project\social_account_business\dto\transaction\TransactionForOrderDto.java
