@@ -61,9 +61,9 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginForm loginForm) {
         log.info("Logging in");
 
-        Account account = accountService.findAccountByEmail(loginForm.getEmail());
+        Account account = accountService.findAccountByUsernameAndPassword(loginForm.getEmail(), loginForm.getPassword());
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginForm.getEmail(), loginForm.getPassword()));
+                new UsernamePasswordAuthenticationToken(account.getEmail(), loginForm.getPassword()));
 
         HttpHeaders responseHeaders = new HttpHeaders();
 
@@ -73,7 +73,7 @@ public class AuthServiceImpl implements AuthService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String message = emailService.getLoginEmailTemplate(account.getUsername(), String.valueOf(new Date()));
-        asyncService.sendEmail(loginForm.getEmail(), "Login confirmation", message, true);
+        asyncService.sendEmail(account.getEmail(), "Login confirmation", message, true);
 
         return new LoginResponse(tokenPair.getAccessToken(), responseHeaders, account.getKind());
     }

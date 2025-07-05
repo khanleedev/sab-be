@@ -11,6 +11,9 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long>, JpaSpecificationExecutor<Account> {
     @Query("SELECT a FROM Account a WHERE a.username = :username")
+    Optional<Account> findAccountByUsernameAndPassword(String username, String password);
+
+    @Query("SELECT a FROM Account a WHERE a.username = :username")
     Optional<Account> findAccountByUsername(String username);
 
     @Query("SELECT a FROM Account a WHERE a.id = :id")

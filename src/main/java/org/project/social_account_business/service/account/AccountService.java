@@ -42,7 +42,7 @@ public interface AccountService {
      * @return the account with the specified username
      */
     Account findAccountByUsername(String username);
-
+    Account findAccountByUsernameAndPassword(String username, String password);
     /**
      * Check if an account exists by email.
      *
@@ -122,4 +122,5 @@ public interface AccountService {
      * @param amount    the amount to add or subtract from the account balance
      */
     void updateAccountBalance(long accountId, double amount, String transactionCode);
+
 }

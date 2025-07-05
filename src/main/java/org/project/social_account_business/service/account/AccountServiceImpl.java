@@ -73,6 +73,13 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional(readOnly = true)
+    public Account findAccountByUsernameAndPassword(String username, String password) {
+        return accountRepository.findAccountByUsernameAndPassword(username, password).orElseThrow(
+                () -> new NotFoundException("[AccountService] ❌ Account not found!", ErrorCode.ACCOUNT_NOT_FOUND));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public boolean existsAccountByEmail(String email) {
         return accountRepository.existsAccountByEmail(email);
     }
