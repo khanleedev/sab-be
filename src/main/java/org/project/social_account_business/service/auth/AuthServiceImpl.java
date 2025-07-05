@@ -61,7 +61,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginForm loginForm) {
         log.info("Logging in");
 
-        Account account = accountService.findAccountByUsernameAndPassword(loginForm.getEmail(), loginForm.getPassword());
+        Account account = accountService.findAccountByUsernameAndPassword(loginForm.getUsername(), loginForm.getPassword());
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(account.getEmail(), loginForm.getPassword()));
 

@@ -33,7 +33,7 @@ public class AuthController {
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiResponse<String>> login(@RequestBody @Valid LoginForm loginForm, BindingResult bindingResult) {
-        log.info("Login attempt for email: {}", loginForm.getEmail());
+        log.info("Login attempt for email: {}", loginForm.getUsername());
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(HttpStatus.BAD_REQUEST, "Invalid login form", null));
         }

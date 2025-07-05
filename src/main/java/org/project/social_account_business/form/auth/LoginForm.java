@@ -14,7 +14,7 @@ import lombok.Setter;
 public class LoginForm {
     @Schema(name = "username", description = "User Email", example = "abc123@gmail.com")
     @NotEmpty(message = "Username is required")
-    private String email;
+    private String username;
     @Schema(name = "password", description = "User Password", example = "password")
     @NotEmpty(message = "Password is required")
     private String password;
