@@ -131,6 +131,7 @@ public class SecurityConfig {
         configuration.setExposedHeaders(Arrays.asList(
                 "Origin", "X-Requested-With", "Content-Type", "Accept",
                 "Authorization", "Content-Disposition"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

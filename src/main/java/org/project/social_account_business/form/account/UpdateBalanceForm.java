@@ -12,7 +12,7 @@ public class UpdateBalanceForm {
     @NotNull(message = "Account ID is required")
     @Schema(description = "The ID of the account", example = "12345")
     private Long accountId;
-    @NotEmpty(message = "Balance is required")
+    @NotNull
     @Schema(description = "The new balance amount", example = "1000000")
     private Double balance;
     @NotEmpty(message = "Transaction code is required")
