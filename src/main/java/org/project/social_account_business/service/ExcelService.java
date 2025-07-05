@@ -49,7 +49,14 @@ public class ExcelService {
         Map<Integer, Consumer<Cell>> cellMapping = new HashMap<>();
         cellMapping.put(0, cell -> uploadItemProductForm.setName(cell.getStringCellValue()));
         cellMapping.put(1, cell -> uploadItemProductForm.setDescription(cell.getStringCellValue()));
-        cellMapping.put(2, cell -> uploadItemProductForm.setPrice(BigDecimal.valueOf(Long.parseLong(cell.getStringCellValue()))));
+        cellMapping.put(2, cell -> {
+            if (cell.getCellType() == CellType.NUMERIC) {
+                uploadItemProductForm.setPrice(BigDecimal.valueOf(cell.getNumericCellValue()));
+            } else if (cell.getCellType() == CellType.STRING) {
+                uploadItemProductForm.setPrice(new BigDecimal(cell.getStringCellValue()));
+            }
+        });
+
 //        cellMapping.put(3, cell -> uploadItemProductForm.setQuantity(Integer.parseInt(cell.getStringCellValue())));
         cellMapping.put(3, cell -> uploadItemProductForm.setMaxPurchasePerAccount(Integer.parseInt(cell.getStringCellValue())));
         return cellMapping;
@@ -62,7 +69,7 @@ public class ExcelService {
 
             for (Map.Entry<Integer, Consumer<Cell>> entry : cellMapping.entrySet()) {
                 Cell cell = row.getCell(entry.getKey());
-                if (cell != null && cell.getCellType() == CellType.STRING) {
+                if (cell != null && (cell.getCellType() == CellType.STRING || cell.getCellType() == CellType.NUMERIC)) {
                     entry.getValue().accept(cell);
                 }
             }
