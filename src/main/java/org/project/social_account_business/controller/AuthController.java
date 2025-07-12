@@ -16,12 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
 
 @RestController
 @RequestMapping("/v1/auth")
+@CrossOrigin(origins = "https://www.skmedia24h.com", maxAge = 3600)
 @Slf4j
 public class AuthController {
 
@@ -32,20 +31,20 @@ public class AuthController {
     }
 
     @PostMapping(value = "/login", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<String>> login(@RequestBody @Valid LoginForm loginForm, BindingResult bindingResult) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody @Valid LoginForm loginForm, BindingResult bindingResult) {
         log.info("Login attempt for email: {}", loginForm.getUsername());
         if (bindingResult.hasErrors()) {
             return ResponseEntity.badRequest().body(new ApiResponse<>(HttpStatus.BAD_REQUEST, "Invalid login form", null));
         }
         LoginResponse loginResponse = authService.login(loginForm);
-        return ResponseEntity.ok().headers(loginResponse.getHeaders()).body(new ApiResponse<>(HttpStatus.OK, String.valueOf(loginResponse.getKind()), loginResponse.getAccessToken()));
+        return ResponseEntity.ok().headers(loginResponse.getHeaders()).body(new ApiResponse<>(HttpStatus.OK, String.valueOf(loginResponse.getKind()), loginResponse));
     }
 
     @PostMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<String>> refreshToken(@CookieValue(name = "rft", required = true) String refreshToken) {
+    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@CookieValue(name = "rft", required = true) String refreshToken) {
         log.info("Refreshing token");
         LoginResponse loginResponse = authService.refreshToken(refreshToken);
-        return ResponseEntity.ok().headers(loginResponse.getHeaders()).body(new ApiResponse<>(HttpStatus.OK, "Token refreshed successfully", loginResponse.getAccessToken()));
+        return ResponseEntity.ok().headers(loginResponse.getHeaders()).body(new ApiResponse<>(HttpStatus.OK, "Token refreshed successfully", loginResponse));
     }
 
     @PostMapping(value = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -122,7 +122,7 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("http://localhost:7070", "http://localhost:5173", "http://localhost:5174",
-                "https://editor.swagger.io", "103.255.238.9", "https://sab-fe-fw5i.vercel.app/", "https://www.skmedia24h.com"));
+                "https://editor.swagger.io", "103.255.238.9", "https://sab-fe-fw5i.vercel.app", "https://www.skmedia24h.com/"));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "OPTIONS", "DELETE", "PATCH"));
         configuration.setAllowedHeaders(Arrays.asList(
                 "Accept", "Origin", "Content-Type", "Depth", "User-Agent", "If-Modified-Since,",
@@ -132,6 +132,7 @@ public class SecurityConfig {
                 "Origin", "X-Requested-With", "Content-Type", "Accept",
                 "Authorization", "Content-Disposition"));
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L); // 1 hour
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

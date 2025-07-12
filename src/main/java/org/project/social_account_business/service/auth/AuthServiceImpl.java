@@ -74,8 +74,7 @@ public class AuthServiceImpl implements AuthService {
 
         String message = emailService.getLoginEmailTemplate(account.getUsername(), String.valueOf(new Date()));
         asyncService.sendEmail(account.getEmail(), "Login confirmation", message, true);
-
-        return new LoginResponse(tokenPair.getAccessToken(), responseHeaders, account.getKind());
+        return new LoginResponse(tokenPair.getAccessToken(), tokenPair.getRefreshToken(), responseHeaders, account.getKind());
     }
 
     @Override
@@ -93,7 +92,7 @@ public class AuthServiceImpl implements AuthService {
 
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword()));
-        return new LoginResponse(tokenPair.getAccessToken(), responseHeaders, account.getKind());
+        return new LoginResponse(tokenPair.getAccessToken(), tokenPair.getRefreshToken(), responseHeaders, account.getKind());
     }
 
     @Override

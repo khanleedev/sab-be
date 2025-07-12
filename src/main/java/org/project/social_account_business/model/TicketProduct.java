@@ -45,5 +45,4 @@ public class TicketProduct extends Auditable<String> {
     private List<Order> orders = new ArrayList<>();
     @OneToMany(mappedBy = "ticketProduct", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TicketProductInfo> ticketProductInfos = new ArrayList<>();
-
 }
