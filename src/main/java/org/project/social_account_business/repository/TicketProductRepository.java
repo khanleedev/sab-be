@@ -44,6 +44,6 @@ public interface TicketProductRepository extends JpaRepository<TicketProduct, Lo
      * @param pageable
      * @return
      */
-    @Query("SELECT tp  FROM TicketProduct tp WHERE tp.ticket.id = :ticketId")
+    @Query("SELECT tp  FROM TicketProduct tp WHERE tp.ticket.id = :ticketId and tp.status = 1 AND tp.quantity > 0")
     Page<TicketProduct> findAllByTicketId(@RequestParam("ticketId") Long ticketId, Pageable pageable);
 }

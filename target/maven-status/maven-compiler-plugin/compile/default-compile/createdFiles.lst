@@ -3,6 +3,7 @@ org\project\social_account_business\model\Currency$CurrencyBuilder.class
 org\project\social_account_business\model\criteria\AccountCriteria$1.class
 org\project\social_account_business\mapper\PaymentTransactionMapperImpl.class
 org\project\social_account_business\dto\payment_transaction\PaypalResponseDto.class
+org\project\social_account_business\repository\TicketProductInfoRepository.class
 org\project\social_account_business\form\paypal_order\OrderRequestForm.class
 org\project\social_account_business\mapper\TransactionMapperImpl.class
 org\project\social_account_business\service\auth\AuthService.class
@@ -12,12 +13,15 @@ org\project\social_account_business\jwt\JwtAuthenticationEntryPoint.class
 org\project\social_account_business\form\auth\RequestRefreshTokenForm.class
 org\project\social_account_business\model\Ticket.class
 org\project\social_account_business\mapper\AccountMapper.class
+org\project\social_account_business\form\ticket_product_info\CreateTicketProductInfoForm.class
 org\project\social_account_business\form\order\CreateOrderForm.class
 org\project\social_account_business\form\payment_transaction\PaymentTransactionWebhookForm.class
 org\project\social_account_business\model\criteria\OrderCriteria$1.class
 org\project\social_account_business\service\AsyncService.class
 org\project\social_account_business\validation\UserKind.class
+org\project\social_account_business\model\TicketProductInfo.class
 org\project\social_account_business\form\UpdateCurrencyForm.class
+org\project\social_account_business\dto\ticket_product_info\TicketProductInfoDto.class
 org\project\social_account_business\model\Report.class
 org\project\social_account_business\model\TokenInfo$TokenInfoBuilder.class
 org\project\social_account_business\form\paypal_order\OrderResponseForm.class
@@ -91,6 +95,7 @@ org\project\social_account_business\model\Currency.class
 org\project\social_account_business\service\ticket_product\TicketProductImpl.class
 org\project\social_account_business\mapper\PaymentTransactionMapper.class
 org\project\social_account_business\dto\transaction\ShortenTransactionDto.class
+org\project\social_account_business\model\TicketProductInfo$TicketProductInfoBuilder.class
 org\project\social_account_business\model\Report$ReportBuilder.class
 org\project\social_account_business\model\TransactionStatus.class
 org\project\social_account_business\form\payment_transaction\CreateTopUpForm.class
@@ -146,6 +151,7 @@ org\project\social_account_business\controller\OTPController.class
 org\project\social_account_business\config\SecurityConfig.class
 org\project\social_account_business\form\transaction\CreateTransactionForPaymentForm.class
 org\project\social_account_business\service\ticket_product\TicketProductService.class
+org\project\social_account_business\form\ticket_product_info\UploadTicketProductInfoForm.class
 org\project\social_account_business\repository\OrderRepository.class
 org\project\social_account_business\service\currency\CurrencyServiceImpl.class
 org\project\social_account_business\exception\GlobalExceptionHandler.class
@@ -179,6 +185,7 @@ org\project\social_account_business\dto\payment_transaction\PaymentTransactionDt
 org\project\social_account_business\form\ticket_product\CreateTicketProductForm.class
 org\project\social_account_business\repository\CurrencyRepository.class
 org\project\social_account_business\service\account\AccountServiceImpl.class
+org\project\social_account_business\form\ticket_product_info\UpdateTicketProductInfoForm.class
 org\project\social_account_business\dto\payment_transaction\PaypalCaptureDto.class
 org\project\social_account_business\utils\RandomPasswordUtils.class
 org\project\social_account_business\form\otp\VerifyOTPForm.class

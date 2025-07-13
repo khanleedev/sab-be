@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 @Getter
 public class LoginResponse {
     private String accessToken;
+    private String refreshToken;
     private HttpHeaders headers;
     private Integer kind;
 }

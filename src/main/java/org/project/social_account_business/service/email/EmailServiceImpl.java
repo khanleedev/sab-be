@@ -4,6 +4,7 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.project.social_account_business.model.TicketProduct;
+import org.project.social_account_business.model.TicketProductInfo;
 import org.project.social_account_business.service.OTPService;
 import org.project.social_account_business.service.currency.CurrencyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -40,6 +42,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(text, html);
+            helper.setFrom(fromEmail);
             mailSender.send(message);
 
             log.info("Sent email to {}", to);
@@ -147,36 +150,71 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String getEmailOrderCompleteTemplate(String name, String transactionCode, Double amountInCoin, Date time, String transactionStatus, String ticketProductName, Integer quantity, String ticketProductItemCode) {
-        return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
-                + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
-                + "<div style=\"text-align: center; padding-bottom: 20px;\">"
-                + "<img src=\"https://cdn-icons-png.flaticon.com/512/845/845646.png\" alt=\"Success\" style=\"width: 80px;\">"
-                + "<h1 style=\"font-size: 1.8em; color: #2ecc71; margin: 20px 0;\">ORDER CONFIRMATION SUCCESS!</h1>"
-                + "</div>"
-                + "<div style=\"padding: 0 20px; font-size: 1em; color: #333;\">"
-                + "<p><strong>Hi " + name + ",</strong></p>"
-                + "<p>Your order confirmation: </p>"
-                + "<ul style=\"list-style: none; padding-left: 0; color: #555;\">"
-                + "<li><strong>Transaction ID: </strong> " + transactionCode + "</li>"
-                + "<li><strong>Amount: </strong> " + amountInCoin + "</li>"
-                + "<li><strong>Order time: </strong> " + time + "</li>"
-                + "<li><strong>Order item: </strong> " + ticketProductName + "&nbsp;&nbsp;&nbsp;" + "<span style\"color:blue; font-weight: bold;\">" + quantity + "</span></li>"
-                + "<li><strong>Item code: </strong> " + ticketProductItemCode + "</li>"
-                + "<li><strong>Order status:</strong> <span style=\"color: green; font-weight: bold;\">" + transactionStatus + "</span></li>"
-                + "</ul>"
-                + "<p>Thanks for choosing our service.</p>"
-                + "<div style=\"text-align: center; margin-top: 30px;\">"
-                + "</div>"
-                + "</div>"
-                + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 30px 0;\" />"
-                + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
-                + "<p>📧 Any confusion please contact by this email:</p>"
-                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #3f51b5; text-decoration: none;\">" + fromEmail + "</a></p>"
-                + "</div>"
-                + "</div>"
-                + "</div>";
+    public String getEmailOrderCompleteTemplate(String name,
+                                                String transactionCode,
+                                                Double amountInCoin,
+                                                Date time,
+                                                String transactionStatus,
+                                                String ticketProductName,
+                                                Integer quantity,
+                                                String ticketProductItemCode,
+                                                List<TicketProductInfo> randomInfos) {
+
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">")
+                .append("<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">")
+                .append("<div style=\"text-align: center; padding-bottom: 20px;\">")
+                .append("<img src=\"https://cdn-icons-png.flaticon.com/512/845/845646.png\" alt=\"Success\" style=\"width: 80px;\">")
+                .append("<h1 style=\"font-size: 1.8em; color: #2ecc71; margin: 20px 0;\">ORDER CONFIRMATION SUCCESS!</h1>")
+                .append("</div>")
+
+                .append("<div style=\"padding: 0 20px; font-size: 1em; color: #333;\">")
+                .append("<p><strong>Hi ").append(name).append(",</strong></p>")
+                .append("<p>Your order confirmation: </p>")
+                .append("<ul style=\"list-style: none; padding-left: 0; color: #555;\">")
+                .append("<li><strong>Transaction ID: </strong> ").append(transactionCode).append("</li>")
+                .append("<li><strong>Amount: </strong> ").append(amountInCoin).append("</li>")
+                .append("<li><strong>Order time: </strong> ").append(time).append("</li>")
+                .append("<li><strong>Order item: </strong> ").append(ticketProductName).append("&nbsp;&nbsp;&nbsp;<span style='color:blue; font-weight: bold;'>").append(quantity).append("</span></li>")
+                .append("<li><strong>Item code: </strong> ").append(ticketProductItemCode).append("</li>")
+                .append("<li><strong>Order status:</strong> <span style='color: green; font-weight: bold;'>").append(transactionStatus).append("</span></li>")
+                .append("<li><strong>Item details: </strong></li>")
+                .append("</ul>");
+
+        if (randomInfos != null && !randomInfos.isEmpty()) {
+            builder.append("<div style='margin-top: 10px;'>")
+                    .append("<p style='font-weight: bold;'>Item information:</p>")
+                    .append("<pre style='background-color: #f9f9f9; padding: 10px; border: 1px solid #ddd; border-radius: 4px; overflow-x: auto; font-size: 14px;'>")
+                    .append("UID | PASS | 2FA | MAIL | PASS MAIL | MAIL VERIFY\n");
+
+            for (TicketProductInfo info : randomInfos) {
+                builder.append(String.format("%s | %s | %s | %s | %s | %s\n",
+                        Optional.ofNullable(info.getUid()).orElse(""),
+                        Optional.ofNullable(info.getPass()).orElse(""),
+                        Optional.ofNullable(info.getTwoFA()).orElse(""),
+                        Optional.ofNullable(info.getMail()).orElse(""),
+                        Optional.ofNullable(info.getPassMail()).orElse(""),
+                        Optional.ofNullable(info.getMailVerify()).orElse("")
+                ));
+            }
+
+            builder.append("</pre></div>");
+        }
+
+        builder.append("<p>Thanks for choosing our service.</p>")
+                .append("</div>")
+                .append("<hr style=\"border: none; border-top: 1px solid #ddd; margin: 30px 0;\" />")
+                .append("<div style=\"text-align: center; font-size: 0.9em; color: #888;\">")
+                .append("<p>📧 Any confusion please contact by this email:</p>")
+                .append("<p>Email: <a href=\"mailto:").append(fromEmail).append("\" style=\"color: #3f51b5; text-decoration: none;\">").append(fromEmail).append("</a></p>")
+                .append("</div>")
+                .append("</div></div>");
+
+        return builder.toString();
     }
+
+
 
     @Override
     public String getEmailApologizeForBalanceErrorTemplate(String name, String transactionCode, double amount, Date correctionTime) {

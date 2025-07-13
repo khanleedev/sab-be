@@ -98,10 +98,10 @@ public class TokenServiceImpl implements TokenService {
     @Transactional
     public TokenPair refreshTokens(String refreshToken) {
         if (!validateToken(refreshToken, TokenType.REFRESH)) {
-            throw new InvalidTokenException("[TokenService] Invalid refresh token");
+            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
         }
         if (isTokenExpired(refreshToken)) {
-            throw new InvalidTokenException("[TokenService] Refresh token has expired");
+            throw new InvalidTokenException(ErrorCode.TOKEN_EXPIRED);
         }
         String email = getUsernameFromToken(refreshToken);
         Account account = accountRepository.findAccountByEmail(email)
@@ -181,13 +181,13 @@ public class TokenServiceImpl implements TokenService {
                     .getBody();
         } catch (ExpiredJwtException e) {
             log.info("Token expired for user: {}", e.getClaims().getSubject());
-            throw new InvalidTokenException("Token has expired. Please refresh or login again");
+            throw new InvalidTokenException(ErrorCode.TOKEN_EXPIRED);
         } catch (UnsupportedJwtException e) {
-            throw new InvalidTokenException("Unsupported token format");
+            throw new InvalidTokenException(ErrorCode.TOKEN_UNSUPPORTED);
         } catch (MalformedJwtException e) {
             throw new InvalidTokenException("Invalid token structure");
         } catch (IllegalArgumentException e) {
-            throw new InvalidTokenException("Invalid tokenIllegalArgumentException");
+            throw new InvalidTokenException(ErrorCode.INVALID_TOKEN);
         } catch (Exception e) {
             log.error("Error parsing token: {}", e.getMessage());
             throw new InvalidTokenException("Error parsing token");

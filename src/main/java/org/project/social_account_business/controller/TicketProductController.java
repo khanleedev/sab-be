@@ -9,12 +9,23 @@ import org.project.social_account_business.constant.BetaConstant;
 import org.project.social_account_business.dto.ApiResponse;
 import org.project.social_account_business.dto.ResponseListDto;
 import org.project.social_account_business.dto.ticket_product.TicketProductDto;
+import org.project.social_account_business.dto.ticket_product_info.TicketProductInfoDto;
+import org.project.social_account_business.exception.BadRequestException;
 import org.project.social_account_business.exception.MyBindingException;
+import org.project.social_account_business.exception.NotFoundException;
 import org.project.social_account_business.form.ticket_product.CreateTicketProductForm;
 import org.project.social_account_business.form.ticket_product.UpdateTicketProductForm;
+import org.project.social_account_business.form.ticket_product_info.CreateTicketProductInfoForm;
+import org.project.social_account_business.form.ticket_product_info.UpdateTicketProductInfoForm;
+import org.project.social_account_business.form.ticket_product_info.UploadTicketProductInfoForm;
+import org.project.social_account_business.mapper.TicketProductMapper;
+import org.project.social_account_business.model.TicketProductInfo;
 import org.project.social_account_business.model.criteria.TicketProductCriteria;
+import org.project.social_account_business.repository.TicketProductInfoRepository;
+import org.project.social_account_business.service.ExcelService;
 import org.project.social_account_business.service.email.EmailService;
 import org.project.social_account_business.service.ticket_product.TicketProductService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -38,11 +49,17 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @Slf4j
 public class TicketProductController extends ABasicController {
     final TicketProductService ticketProductService;
+    final TicketProductInfoRepository ticketProductInfoRepository;
     final EmailService emailService;
+    final ExcelService excelService;
+    private final TicketProductMapper ticketProductMapper;
 
-    public TicketProductController(TicketProductService ticketProductService, EmailService emailService) {
+    public TicketProductController(TicketProductService ticketProductService, TicketProductInfoRepository ticketProductInfoRepository, EmailService emailService, ExcelService excelService, TicketProductMapper ticketProductMapper) {
         this.ticketProductService = ticketProductService;
+        this.ticketProductInfoRepository = ticketProductInfoRepository;
         this.emailService = emailService;
+        this.excelService = excelService;
+        this.ticketProductMapper = ticketProductMapper;
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -145,5 +162,136 @@ public class TicketProductController extends ABasicController {
         log.info("Getting active ticket products");
         ticketProductCriteria.setStatus(BetaConstant.STATUS_ACTIVE);
         return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Active ticket products retrieved successfully", ticketProductService.getTicketProducts(ticketProductCriteria, pageable)));
+    }
+
+    @PostMapping(value = "/infos", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> createTicketProductInfos(@Valid @RequestBody CreateTicketProductInfoForm createTicketProductInfoForm, BindingResult bindingResult){
+        log.info("Creating ticket product infos");
+        if (bindingResult.hasErrors()) {
+            log.error("Error in creating ticket product infos: {}", Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+            throw new MyBindingException(bindingResult.getFieldError().getDefaultMessage());
+        }
+        val ticketProduct = ticketProductService.findById(createTicketProductInfoForm.getTicketProductId());
+        TicketProductInfo ticketProductInfo = TicketProductInfo.builder()
+                .ticketProduct(ticketProduct)
+                .uid(createTicketProductInfoForm.getUid())
+                .pass(createTicketProductInfoForm.getPass())
+                .twoFA(createTicketProductInfoForm.getTwoFA())
+                .mail(createTicketProductInfoForm.getMail())
+                .passMail(createTicketProductInfoForm.getPassMail())
+                .mailVerify(createTicketProductInfoForm.getMailVerify())
+                .isSold(false)
+                .build();
+
+        // 3. Lưu vào DB
+        ticketProductInfoRepository.save(ticketProductInfo);
+        ticketProduct.setQuantity(ticketProduct.getQuantity() + 1);
+        ticketProductService.save(ticketProduct);
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.CREATED, "Ticket product infos created successfully"));
+    }
+
+    @GetMapping(value = "/infos", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse<ResponseListDto<List<TicketProductInfo>>>> getTicketProductInfos(@RequestParam("ticketProductId") Long ticketProductId, Pageable pageable) {
+        log.info("Getting ticket product infos by ticket product ID");
+        Page<TicketProductInfo> infos = ticketProductInfoRepository.findAllByTicketProductId(ticketProductId, pageable);
+        ResponseListDto responseListDto = new ResponseListDto(
+                ticketProductMapper.fromEntitiesToTicketProductInfoDtos(infos.getContent()),
+                infos.getTotalElements(),
+                infos.getTotalPages()
+        );
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Infos retrieved successfully", responseListDto));
+    }
+
+    @GetMapping(value = "/infos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse<TicketProductInfoDto>> getTicketProductInfo(@PathVariable("id") Long id) {
+        log.info("Getting ticket product info by ID: {}", id);
+        TicketProductInfo info = ticketProductInfoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("TicketProductInfo not found"));
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Info retrieved", ticketProductMapper.fromEntityToTicketProductInfoDto(info)));
+    }
+
+    @PutMapping(value = "/infos", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse<String>> updateTicketProductInfo(@Valid @RequestBody UpdateTicketProductInfoForm form, BindingResult bindingResult) {
+        log.info("Updating ticket product info");
+        if (bindingResult.hasErrors()) {
+            throw new MyBindingException(Objects.requireNonNull(bindingResult.getFieldError()).getDefaultMessage());
+        }
+
+        TicketProductInfo info = ticketProductInfoRepository.findById(form.getId())
+                .orElseThrow(() -> new NotFoundException("TicketProductInfo not found"));
+
+        info.setUid(form.getUid());
+        info.setPass(form.getPass());
+        info.setTwoFA(form.getTwoFA());
+        info.setMail(form.getMail());
+        info.setPassMail(form.getPassMail());
+        info.setMailVerify(form.getMailVerify());
+        ticketProductInfoRepository.save(info);
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Info updated successfully"));
+    }
+
+    @PatchMapping(value = "/infos/soft-delete/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse<String>> softDeleteTicketProductInfo(@PathVariable("id") Long id) {
+        log.info("Soft deleting ticket product info with id: {}", id);
+        TicketProductInfo info = ticketProductInfoRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("TicketProductInfo not found"));
+        info.setStatus(BetaConstant.STATUS_DELETE);
+        ticketProductInfoRepository.save(info);
+        val ticketProduct = info.getTicketProduct();
+        ticketProduct.setQuantity(ticketProduct.getQuantity() - 1);
+        ticketProductService.save(ticketProduct);
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Soft deleted successfully"));
+    }
+
+    @DeleteMapping(value = "/infos/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<ApiResponse<String>> deleteTicketProductInfo(@PathVariable("id") Long id) {
+        log.info("Deleting ticket product info with id: {}", id);
+        ticketProductInfoRepository.deleteById(id);
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, "Deleted successfully"));
+    }
+
+    @PostMapping(value = "/infos/upload/{tpId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @Transactional
+    public ResponseEntity<ApiResponse<String>> uploadTicketProductInfos(
+            @RequestParam("file") MultipartFile file,
+            @PathVariable("tpId") Long ticketProductId) throws Exception {
+        log.info("Uploading TicketProductInfos to TicketProduct id = {}", ticketProductId);
+
+        if (!excelService.hasExcelFormat(file)) {
+            throw new BadRequestException("File format must be .xlsx");
+        }
+
+        val ticketProduct = ticketProductService.findById(ticketProductId);
+        List<UploadTicketProductInfoForm> infos = excelService.mapExcelToTicketProductInfos(file.getInputStream());
+
+        List<TicketProductInfo> entities = infos.stream()
+                .map(form -> TicketProductInfo.builder()
+                        .ticketProduct(ticketProduct)
+                        .uid(form.getUid())
+                        .pass(form.getPass())
+                        .twoFA(form.getTwoFA())
+                        .mail(form.getMail())
+                        .passMail(form.getPassMail())
+                        .mailVerify(form.getMailVerify())
+                        .isSold(false)
+                        .build())
+                .toList();
+
+        ticketProductInfoRepository.saveAll(entities);
+        ticketProduct.setQuantity(ticketProduct.getQuantity() + infos.size());
+
+        return ResponseEntity.ok(new ApiResponse<>(HttpStatus.OK, infos.size() + " TicketProductInfos uploaded successfully"));
     }
 }

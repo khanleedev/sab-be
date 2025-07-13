@@ -12,8 +12,10 @@ import org.project.social_account_business.form.order.CreateOrderForm;
 import org.project.social_account_business.mapper.OrderMapper;
 import org.project.social_account_business.model.Order;
 import org.project.social_account_business.model.TicketProduct;
+import org.project.social_account_business.model.TicketProductInfo;
 import org.project.social_account_business.model.criteria.OrderCriteria;
 import org.project.social_account_business.repository.OrderRepository;
+import org.project.social_account_business.repository.TicketProductInfoRepository;
 import org.project.social_account_business.service.account.AccountService;
 import org.project.social_account_business.service.ticket_product.TicketProductService;
 import org.project.social_account_business.service.transaction.TransactionService;
@@ -32,18 +34,20 @@ public class OrderServiceImpl implements OrderService {
     final AccountService accountService;
     final TicketProductService ticketProductService;
     final TransactionService transactionService;
+    final TicketProductInfoRepository ticketProductInfoRepository;
 
-    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper, AccountService accountService, TicketProductService ticketProductService, TransactionService transactionService) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper, AccountService accountService, TicketProductService ticketProductService, TransactionService transactionService, TicketProductInfoRepository ticketProductInfoRepository) {
         this.orderRepository = orderRepository;
         this.orderMapper = orderMapper;
         this.accountService = accountService;
         this.ticketProductService = ticketProductService;
         this.transactionService = transactionService;
+        this.ticketProductInfoRepository = ticketProductInfoRepository;
     }
 
     @Override
     @Transactional
-    public void createOrder(CreateOrderForm createOrderForm) {
+    public List<TicketProductInfo> createOrder(CreateOrderForm createOrderForm) {
         log.info("[OrderService] Creating order with userId: {}", createOrderForm.getAccountId());
         if (createOrderForm.getQuantity() <= 0) {
             throw new BadRequestException("[OrderService] Quantity must be greater than 0", ErrorCode.ORDER_QUANTITY_INVALID);
@@ -54,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
         }
 
         val account = accountService.findById(createOrderForm.getAccountId());
-        double totalPrice = ticketProduct.getPrice() * createOrderForm.getQuantity();
+        double totalPrice = ticketProduct.getPrice().doubleValue() * createOrderForm.getQuantity();
 
         if (account.getBalance() < totalPrice) {
             throw new BadRequestException("[OrderService] Not enough balance", ErrorCode.ACOUNT_NOT_ENOUGH_BALANCE);
@@ -71,7 +75,18 @@ public class OrderServiceImpl implements OrderService {
         order.setAccount(account);
         order.setTicketProduct(ticketProduct);
         orderRepository.save(order);
-        transactionService.createTransactionForOrder(order);
+        List<TicketProductInfo> randomInfos = ticketProductInfoRepository
+                .findAvailableRandomInfos(ticketProduct.getId(), createOrderForm.getQuantity());
+
+        if (randomInfos.size() < createOrderForm.getQuantity()) {
+            throw new BadRequestException("[OrderService] Not enough ticket available!", ErrorCode.TICKET_PRODUCT_INFO_NOT_ENOUGH);
+        }
+
+        randomInfos.forEach(info -> info.setIsSold(true));
+        ticketProductInfoRepository.saveAll(randomInfos);
+
+        transactionService.createTransactionForOrder(order, randomInfos);
+        return randomInfos;
     }
 
 

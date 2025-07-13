@@ -1,5 +1,6 @@
 package org.project.social_account_business.mapper;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -8,15 +9,17 @@ import javax.annotation.processing.Generated;
 import org.project.social_account_business.dto.ticket.TicketDto;
 import org.project.social_account_business.dto.ticket_product.ShortenTicketProductDto;
 import org.project.social_account_business.dto.ticket_product.TicketProductDto;
+import org.project.social_account_business.dto.ticket_product_info.TicketProductInfoDto;
 import org.project.social_account_business.form.ticket_product.CreateTicketProductForm;
 import org.project.social_account_business.form.ticket_product.UpdateTicketProductForm;
 import org.project.social_account_business.model.Ticket;
 import org.project.social_account_business.model.TicketProduct;
+import org.project.social_account_business.model.TicketProductInfo;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-06-01T17:36:34+0700",
+    date = "2025-07-13T15:30:10+0700",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
 )
 @Component
@@ -33,7 +36,9 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         ticketProduct.name( createTicketProductForm.getName() );
         ticketProduct.description( createTicketProductForm.getDescription() );
         ticketProduct.quantity( createTicketProductForm.getQuantity() );
-        ticketProduct.price( createTicketProductForm.getPrice() );
+        if ( createTicketProductForm.getPrice() != null ) {
+            ticketProduct.price( BigDecimal.valueOf( createTicketProductForm.getPrice() ) );
+        }
         ticketProduct.maxPurchasePerAccount( createTicketProductForm.getMaxPurchasePerAccount() );
 
         return ticketProduct.build();
@@ -52,7 +57,7 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         ticketProductDto.setDescription( ticketProduct.getDescription() );
         ticketProductDto.setQuantity( ticketProduct.getQuantity() );
         if ( ticketProduct.getPrice() != null ) {
-            ticketProductDto.setPrice( ticketProduct.getPrice().longValue() );
+            ticketProductDto.setPrice( ticketProduct.getPrice().doubleValue() );
         }
         ticketProductDto.setItemCode( ticketProduct.getItemCode() );
         ticketProductDto.setTicket( ticketToTicketDto( ticketProduct.getTicket() ) );
@@ -80,7 +85,7 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         shortenTicketProductDto.setId( ticketProduct.getId() );
         shortenTicketProductDto.setName( ticketProduct.getName() );
         if ( ticketProduct.getPrice() != null ) {
-            shortenTicketProductDto.setPrice( String.valueOf( ticketProduct.getPrice() ) );
+            shortenTicketProductDto.setPrice( ticketProduct.getPrice().doubleValue() );
         }
         shortenTicketProductDto.setItemCode( ticketProduct.getItemCode() );
 
@@ -117,11 +122,45 @@ public class TicketProductMapperImpl implements TicketProductMapper {
             ticketProduct.setQuantity( updateTicketProductForm.getQuantity() );
         }
         if ( updateTicketProductForm.getPrice() != null ) {
-            ticketProduct.setPrice( updateTicketProductForm.getPrice().doubleValue() );
+            ticketProduct.setPrice( BigDecimal.valueOf( updateTicketProductForm.getPrice() ) );
         }
         if ( updateTicketProductForm.getMaxPurchasePerAccount() != null ) {
             ticketProduct.setMaxPurchasePerAccount( updateTicketProductForm.getMaxPurchasePerAccount() );
         }
+    }
+
+    @Override
+    public TicketProductInfoDto fromEntityToTicketProductInfoDto(TicketProductInfo ticketProductInfo) {
+        if ( ticketProductInfo == null ) {
+            return null;
+        }
+
+        TicketProductInfoDto ticketProductInfoDto = new TicketProductInfoDto();
+
+        ticketProductInfoDto.setId( ticketProductInfo.getId() );
+        ticketProductInfoDto.setUid( ticketProductInfo.getUid() );
+        ticketProductInfoDto.setPass( ticketProductInfo.getPass() );
+        ticketProductInfoDto.setTwoFA( ticketProductInfo.getTwoFA() );
+        ticketProductInfoDto.setMail( ticketProductInfo.getMail() );
+        ticketProductInfoDto.setPassMail( ticketProductInfo.getPassMail() );
+        ticketProductInfoDto.setMailVerify( ticketProductInfo.getMailVerify() );
+        ticketProductInfoDto.setIsSold( ticketProductInfo.getIsSold() );
+
+        return ticketProductInfoDto;
+    }
+
+    @Override
+    public List<TicketProductInfoDto> fromEntitiesToTicketProductInfoDtos(List<TicketProductInfo> ticketProductInfos) {
+        if ( ticketProductInfos == null ) {
+            return null;
+        }
+
+        List<TicketProductInfoDto> list = new ArrayList<TicketProductInfoDto>( ticketProductInfos.size() );
+        for ( TicketProductInfo ticketProductInfo : ticketProductInfos ) {
+            list.add( fromEntityToTicketProductInfoDto( ticketProductInfo ) );
+        }
+
+        return list;
     }
 
     protected TicketDto ticketToTicketDto(Ticket ticket) {

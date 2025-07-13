@@ -5,6 +5,7 @@ import lombok.*;
 import org.project.social_account_business.validation.SystemId;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class TicketProduct extends Auditable<String> {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
     @Column(name = "price")
-    private Double price;
+    private BigDecimal price;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ticket_id", nullable = false)
     private Ticket ticket;
@@ -42,4 +43,6 @@ public class TicketProduct extends Auditable<String> {
     private Integer maxPurchasePerAccount = 1;
     @OneToMany(mappedBy = "ticketProduct", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
+    @OneToMany(mappedBy = "ticketProduct", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TicketProductInfo> ticketProductInfos = new ArrayList<>();
 }
