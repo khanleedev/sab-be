@@ -139,8 +139,8 @@
             <column name="transaction_date" type="DATETIME"/>
             <column name="account_number" type="VARCHAR(255)"/>
             <column name="account_id" type="BIGINT"/>
-            <column name="amount_in" type="DECIMAL"/>
-            <column name="accumulated" type="DECIMAL"/>
+            <column name="amount_in" type="DECIMAL(20, 4)"/>
+            <column name="accumulated" type="DECIMAL(20, 4)"/>
             <column name="code" type="VARCHAR(255)"/>
             <column name="description" type="VARCHAR(255)"/>
             <column name="reference_number" type="VARCHAR(255)"/>
@@ -202,11 +202,11 @@
             <column name="quantity" type="INT">
                 <constraints nullable="false"/>
             </column>
-            <column name="price" type="DOUBLE"/>
+            <column name="price" type="DECIMAL(20, 4)"/>
             <column name="ticket_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="description" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(500)"/>
             <column name="item_code" type="VARCHAR(255)"/>
             <column name="max_purchase_per_account" type="INT"/>
             <column name="created_by" type="VARCHAR(255)">
@@ -226,6 +226,59 @@
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="1744449325475-52" author="GIGABYTE">
+        <createTable tableName="sab_db_ticket_product_infos">
+            <column name="id" type="BIGINT">
+                <constraints primaryKey="true" nullable="false" primaryKeyName="pk_sab_db_ticket_product_infos"/>
+            </column>
+
+            <column name="uid" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="pass" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="2_fa" type="VARCHAR(255)"/>
+
+            <column name="mail" type="VARCHAR(255)"/>
+
+            <column name="pass_mail" type="VARCHAR(255)"/>
+
+            <column name="mail_verify" type="VARCHAR(255)"/>
+
+            <column name="is_sold" type="TINYINT(1)">
+                <constraints nullable="false"/>
+            </column>
+
+            <column name="ticket_product_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ticket_product_info_product"
+                             referencedTableName="sab_db_ticket_products"
+                             referencedColumnNames="id"/>
+            </column>
+
+            <!-- Auditable fields -->
+            <column name="created_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_by" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="modified_date" type="DATETIME">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
     <changeSet id="1744540780459-8" author="GIGABYTE">
         <createTable tableName="sab_db_tickets">
             <column name="id" type="BIGINT">
@@ -287,7 +340,7 @@
             </column>
             <column name="transaction_id" type="BIGINT"/>
             <column name="amount_in_coin" type="DOUBLE"/>
-            <column name="amount_in_cash" type="DECIMAL"/>
+            <column name="amount_in_cash" type="DECIMAL(20, 4)"/>
             <column name="order_status" type="VARCHAR(255)"/>
             <column name="transaction_type" type="VARCHAR(255)"/>
             <column name="transaction_code" type="VARCHAR(255)"/>

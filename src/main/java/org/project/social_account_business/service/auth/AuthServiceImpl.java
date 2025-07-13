@@ -5,6 +5,7 @@ import lombok.val;
 import org.apache.commons.lang.StringUtils;
 import org.project.social_account_business.constant.BetaConstant;
 import org.project.social_account_business.constant.ErrorCode;
+import org.project.social_account_business.dto.ApiResponse;
 import org.project.social_account_business.dto.LoginResponse;
 import org.project.social_account_business.exception.BadRequestException;
 import org.project.social_account_business.exception.InvalidTokenException;
@@ -21,6 +22,7 @@ import org.project.social_account_business.utils.AESUtils;
 import org.project.social_account_business.utils.ConvertUtils;
 import org.project.social_account_business.utils.CookieUtil;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -58,41 +60,56 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public LoginResponse login(LoginForm loginForm) {
+    public ApiResponse<LoginResponse> login(LoginForm loginForm) {
         log.info("Logging in");
 
         Account account = accountService.findAccountByUsernameAndPassword(loginForm.getUsername(), loginForm.getPassword());
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(account.getEmail(), loginForm.getPassword()));
+        try {
 
-        HttpHeaders responseHeaders = new HttpHeaders();
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(account.getEmail(), loginForm.getPassword()));
 
-        TokenPair tokenPair = tokenService.generateTokenPair(account);
-        addRefreshTokenCookie(responseHeaders, tokenPair.getRefreshToken());
+            HttpHeaders responseHeaders = new HttpHeaders();
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            TokenPair tokenPair = tokenService.generateTokenPair(account);
+            addRefreshTokenCookie(responseHeaders, tokenPair.getRefreshToken());
 
-        String message = emailService.getLoginEmailTemplate(account.getUsername(), String.valueOf(new Date()));
-        asyncService.sendEmail(account.getEmail(), "Login confirmation", message, true);
-        return new LoginResponse(tokenPair.getAccessToken(), tokenPair.getRefreshToken(), responseHeaders, account.getKind());
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+
+            String message = emailService.getLoginEmailTemplate(account.getUsername(), String.valueOf(new Date()));
+            asyncService.sendEmail(account.getEmail(), "Login confirmation", message, true);
+            LoginResponse loginResponse = new LoginResponse(
+                    tokenPair.getAccessToken(), tokenPair.getRefreshToken(), responseHeaders, account.getKind());
+            return new ApiResponse<>(HttpStatus.OK, "Login successful", loginResponse);
+        }
+        catch (Exception e) {
+            log.error("Login failed for email: {}", loginForm.getUsername(), e);
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Login failed for user: " + loginForm.getUsername(), null);
+        }
     }
 
     @Override
-    public LoginResponse refreshToken(String refreshToken) {
+    public ApiResponse<LoginResponse> refreshToken(String refreshToken) {
         log.info("Refreshing token");
 
         tokenService.validateToken(refreshToken, TokenType.REFRESH);
         tokenService.invalidateToken(refreshToken);
 
         Account account = tokenService.getAccountByToken(refreshToken);
-        TokenPair tokenPair = tokenService.generateTokenPair(account);
+        try {
+            TokenPair tokenPair = tokenService.generateTokenPair(account);
 
-        HttpHeaders responseHeaders = new HttpHeaders();
-        addRefreshTokenCookie(responseHeaders, tokenPair.getRefreshToken());
+            HttpHeaders responseHeaders = new HttpHeaders();
+            addRefreshTokenCookie(responseHeaders, tokenPair.getRefreshToken());
 
-        SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword()));
-        return new LoginResponse(tokenPair.getAccessToken(), tokenPair.getRefreshToken(), responseHeaders, account.getKind());
+            SecurityContextHolder.getContext().setAuthentication(
+                    new UsernamePasswordAuthenticationToken(account.getEmail(), account.getPassword()));
+            LoginResponse loginResponse = new LoginResponse(tokenPair.getAccessToken(), tokenPair.getRefreshToken(), responseHeaders, account.getKind());
+            return new ApiResponse<>(HttpStatus.OK, "Token refreshed successfully", loginResponse);
+        }catch (InvalidTokenException e) {
+            log.error("Failed to refresh token for email: {}", account.getEmail(), e);
+            return new ApiResponse<>(HttpStatus.UNAUTHORIZED, "Failed to refresh token for user: " + account.getEmail(), null);
+        }
     }
 
     @Override

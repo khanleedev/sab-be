@@ -101,7 +101,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         ApiMessageDto<String> apiMessageDto = new ApiMessageDto<>();
         apiMessageDto.setResult(false);
         apiMessageDto.setMessage(ex.getMessage());
-        return new ResponseEntity<>(apiMessageDto, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(apiMessageDto, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler({BadRequestException.class})
