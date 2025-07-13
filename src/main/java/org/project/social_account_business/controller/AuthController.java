@@ -41,7 +41,7 @@ public class AuthController {
     }
 
     @PostMapping(value = "/refresh", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@CookieValue(name = "rft", required = true) String refreshToken) {
+    public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestParam("refresh_token") String refreshToken) {
         log.info("Refreshing token");
         LoginResponse loginResponse = authService.refreshToken(refreshToken);
         return ResponseEntity.ok().headers(loginResponse.getHeaders()).body(new ApiResponse<>(HttpStatus.OK, "Token refreshed successfully", loginResponse));
