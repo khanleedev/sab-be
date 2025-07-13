@@ -1,6 +1,5 @@
 package org.project.social_account_business.service.auth;
 
-import org.project.social_account_business.dto.ApiResponse;
 import org.project.social_account_business.dto.LoginResponse;
 import org.project.social_account_business.form.auth.LoginForm;
 import org.project.social_account_business.form.otp.ForgetPasswordPayload;
@@ -13,7 +12,7 @@ public interface AuthService {
     * @param loginForm the form containing login credentials (e.g., username and password)
     * @return the login response with tokens and user details
     */
-   ApiResponse<LoginResponse> login(LoginForm loginForm);
+   LoginResponse login(LoginForm loginForm);
 
    /**
     * Refresh the access token using a valid refresh token.
@@ -21,7 +20,7 @@ public interface AuthService {
     * @param refreshToken the refresh token to generate a new access token
     * @return the login response with a new access token and potentially a new refresh token
     */
-   ApiResponse<LoginResponse> refreshToken(String refreshToken);
+   LoginResponse refreshToken(String refreshToken);
 
    /**
     * Log out a user by invalidating the provided access and refresh tokens.
