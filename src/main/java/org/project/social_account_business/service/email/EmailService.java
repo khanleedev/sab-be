@@ -20,6 +20,7 @@ public interface EmailService {
     @Async
     CompletableFuture<Void> sendEmail(String to, String subject, String text, boolean html);
 
+    String getGeneralEmailTemplate(String name, String message, String subject);
     /**
      * Generate the email template for login notification.
      *

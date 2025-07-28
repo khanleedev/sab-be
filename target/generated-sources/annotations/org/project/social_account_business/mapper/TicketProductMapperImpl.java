@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-13T16:04:21+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
+    date = "2025-07-26T20:59:11+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250628-1110, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class TicketProductMapperImpl implements TicketProductMapper {
@@ -62,14 +62,14 @@ public class TicketProductMapperImpl implements TicketProductMapper {
         ticketProductDto.setItemCode( ticketProduct.getItemCode() );
         ticketProductDto.setTicket( ticketToTicketDto( ticketProduct.getTicket() ) );
         ticketProductDto.setMaxPurchasePerAccount( ticketProduct.getMaxPurchasePerAccount() );
-        ticketProductDto.setStatus( ticketProduct.getStatus() );
-        if ( ticketProduct.getModifiedDate() != null ) {
-            ticketProductDto.setModifiedDate( LocalDateTime.ofInstant( ticketProduct.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        ticketProductDto.setCreatedBy( ticketProduct.getCreatedBy() );
         if ( ticketProduct.getCreatedDate() != null ) {
             ticketProductDto.setCreatedDate( LocalDateTime.ofInstant( ticketProduct.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        ticketProductDto.setCreatedBy( ticketProduct.getCreatedBy() );
+        if ( ticketProduct.getModifiedDate() != null ) {
+            ticketProductDto.setModifiedDate( LocalDateTime.ofInstant( ticketProduct.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        ticketProductDto.setStatus( ticketProduct.getStatus() );
 
         return ticketProductDto;
     }
@@ -170,14 +170,14 @@ public class TicketProductMapperImpl implements TicketProductMapper {
 
         TicketDto ticketDto = new TicketDto();
 
-        ticketDto.setStatus( ticket.getStatus() );
-        if ( ticket.getModifiedDate() != null ) {
-            ticketDto.setModifiedDate( LocalDateTime.ofInstant( ticket.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        ticketDto.setCreatedBy( ticket.getCreatedBy() );
         if ( ticket.getCreatedDate() != null ) {
             ticketDto.setCreatedDate( LocalDateTime.ofInstant( ticket.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        ticketDto.setCreatedBy( ticket.getCreatedBy() );
+        if ( ticket.getModifiedDate() != null ) {
+            ticketDto.setModifiedDate( LocalDateTime.ofInstant( ticket.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        ticketDto.setStatus( ticket.getStatus() );
         ticketDto.setId( ticket.getId() );
         ticketDto.setTitle( ticket.getTitle() );
 

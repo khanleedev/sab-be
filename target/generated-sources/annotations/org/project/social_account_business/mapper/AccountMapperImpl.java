@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-13T16:04:21+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
+    date = "2025-07-26T20:59:10+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250628-1110, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class AccountMapperImpl implements AccountMapper {
@@ -57,14 +57,14 @@ public class AccountMapperImpl implements AccountMapper {
 
         AccountDto accountDto = new AccountDto( id, username, email, phoneNo, balance );
 
-        accountDto.setStatus( account.getStatus() );
-        if ( account.getModifiedDate() != null ) {
-            accountDto.setModifiedDate( LocalDateTime.ofInstant( account.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        accountDto.setCreatedBy( account.getCreatedBy() );
         if ( account.getCreatedDate() != null ) {
             accountDto.setCreatedDate( LocalDateTime.ofInstant( account.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        accountDto.setCreatedBy( account.getCreatedBy() );
+        if ( account.getModifiedDate() != null ) {
+            accountDto.setModifiedDate( LocalDateTime.ofInstant( account.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        accountDto.setStatus( account.getStatus() );
 
         return accountDto;
     }

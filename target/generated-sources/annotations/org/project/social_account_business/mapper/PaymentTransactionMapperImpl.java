@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-13T16:04:20+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
+    date = "2025-07-26T20:59:10+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250628-1110, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class PaymentTransactionMapperImpl implements PaymentTransactionMapper {
@@ -68,14 +68,14 @@ public class PaymentTransactionMapperImpl implements PaymentTransactionMapper {
         paymentTransactionDto.setReferenceNumber( paymentTransaction.getReferenceNumber() );
         paymentTransactionDto.setCallbackUrl( paymentTransaction.getCallbackUrl() );
         paymentTransactionDto.setSepayTransactionId( paymentTransaction.getSepayTransactionId() );
-        paymentTransactionDto.setStatus( paymentTransaction.getStatus() );
-        if ( paymentTransaction.getModifiedDate() != null ) {
-            paymentTransactionDto.setModifiedDate( LocalDateTime.ofInstant( paymentTransaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        paymentTransactionDto.setCreatedBy( paymentTransaction.getCreatedBy() );
         if ( paymentTransaction.getCreatedDate() != null ) {
             paymentTransactionDto.setCreatedDate( LocalDateTime.ofInstant( paymentTransaction.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        paymentTransactionDto.setCreatedBy( paymentTransaction.getCreatedBy() );
+        if ( paymentTransaction.getModifiedDate() != null ) {
+            paymentTransactionDto.setModifiedDate( LocalDateTime.ofInstant( paymentTransaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        paymentTransactionDto.setStatus( paymentTransaction.getStatus() );
 
         return paymentTransactionDto;
     }

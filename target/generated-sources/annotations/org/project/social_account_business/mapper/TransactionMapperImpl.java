@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-13T16:04:21+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
+    date = "2025-07-26T20:59:10+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250628-1110, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class TransactionMapperImpl implements TransactionMapper {
@@ -38,14 +38,14 @@ public class TransactionMapperImpl implements TransactionMapper {
         if ( transaction.getTransactionType() != null ) {
             transactionDto.setTransactionType( transaction.getTransactionType().name() );
         }
-        transactionDto.setStatus( transaction.getStatus() );
-        if ( transaction.getModifiedDate() != null ) {
-            transactionDto.setModifiedDate( LocalDateTime.ofInstant( transaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        transactionDto.setCreatedBy( transaction.getCreatedBy() );
         if ( transaction.getCreatedDate() != null ) {
             transactionDto.setCreatedDate( LocalDateTime.ofInstant( transaction.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        transactionDto.setCreatedBy( transaction.getCreatedBy() );
+        if ( transaction.getModifiedDate() != null ) {
+            transactionDto.setModifiedDate( LocalDateTime.ofInstant( transaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        transactionDto.setStatus( transaction.getStatus() );
 
         return transactionDto;
     }
@@ -63,14 +63,14 @@ public class TransactionMapperImpl implements TransactionMapper {
         if ( transaction.getOrderStatus() != null ) {
             transactionForOrderDto.setOrderStatus( transaction.getOrderStatus().name() );
         }
-        transactionForOrderDto.setStatus( transaction.getStatus() );
-        if ( transaction.getModifiedDate() != null ) {
-            transactionForOrderDto.setModifiedDate( LocalDateTime.ofInstant( transaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        transactionForOrderDto.setCreatedBy( transaction.getCreatedBy() );
         if ( transaction.getCreatedDate() != null ) {
             transactionForOrderDto.setCreatedDate( LocalDateTime.ofInstant( transaction.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        transactionForOrderDto.setCreatedBy( transaction.getCreatedBy() );
+        if ( transaction.getModifiedDate() != null ) {
+            transactionForOrderDto.setModifiedDate( LocalDateTime.ofInstant( transaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        transactionForOrderDto.setStatus( transaction.getStatus() );
 
         return transactionForOrderDto;
     }
@@ -90,14 +90,14 @@ public class TransactionMapperImpl implements TransactionMapper {
         if ( transaction.getOrderStatus() != null ) {
             transactionForPaymentDto.setOrderStatus( transaction.getOrderStatus().name() );
         }
-        transactionForPaymentDto.setStatus( transaction.getStatus() );
-        if ( transaction.getModifiedDate() != null ) {
-            transactionForPaymentDto.setModifiedDate( LocalDateTime.ofInstant( transaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        transactionForPaymentDto.setCreatedBy( transaction.getCreatedBy() );
         if ( transaction.getCreatedDate() != null ) {
             transactionForPaymentDto.setCreatedDate( LocalDateTime.ofInstant( transaction.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        transactionForPaymentDto.setCreatedBy( transaction.getCreatedBy() );
+        if ( transaction.getModifiedDate() != null ) {
+            transactionForPaymentDto.setModifiedDate( LocalDateTime.ofInstant( transaction.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        transactionForPaymentDto.setStatus( transaction.getStatus() );
 
         return transactionForPaymentDto;
     }

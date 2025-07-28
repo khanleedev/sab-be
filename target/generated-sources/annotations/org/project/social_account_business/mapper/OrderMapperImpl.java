@@ -14,8 +14,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-07-13T16:04:21+0700",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.9 (Oracle Corporation)"
+    date = "2025-07-26T20:59:10+0700",
+    comments = "version: 1.5.5.Final, compiler: Eclipse JDT (IDE) 3.42.50.v20250628-1110, environment: Java 21.0.7 (Eclipse Adoptium)"
 )
 @Component
 public class OrderMapperImpl implements OrderMapper {
@@ -51,14 +51,14 @@ public class OrderMapperImpl implements OrderMapper {
         orderDto.setAccount( accountMapper.fromEntityToAutoCompleteAccountDto( order.getAccount() ) );
         orderDto.setQuantity( order.getQuantity() );
         orderDto.setTotalPrice( order.getTotalPrice() );
-        orderDto.setStatus( order.getStatus() );
-        if ( order.getModifiedDate() != null ) {
-            orderDto.setModifiedDate( LocalDateTime.ofInstant( order.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
-        }
+        orderDto.setCreatedBy( order.getCreatedBy() );
         if ( order.getCreatedDate() != null ) {
             orderDto.setCreatedDate( LocalDateTime.ofInstant( order.getCreatedDate().toInstant(), ZoneId.of( "UTC" ) ) );
         }
-        orderDto.setCreatedBy( order.getCreatedBy() );
+        if ( order.getModifiedDate() != null ) {
+            orderDto.setModifiedDate( LocalDateTime.ofInstant( order.getModifiedDate().toInstant(), ZoneId.of( "UTC" ) ) );
+        }
+        orderDto.setStatus( order.getStatus() );
 
         return orderDto;
     }

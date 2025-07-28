@@ -29,9 +29,10 @@ public class EmailServiceImpl implements EmailService {
         this.mailSender = mailSender;
     }
 
-
     @Value("${spring.mail.username}")
     private String fromEmail;
+    @Value("${global-link.logo-base64}")
+    private String logoBase64;
 
     @Override
     @Async
@@ -54,121 +55,71 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public String getLoginEmailTemplate(String name, String loginTime) {
+    public String getGeneralEmailTemplate(String name, String message, String subject) {
         return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
                 + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
                 + "<div style=\"border-bottom: 1px solid #ddd; padding-bottom: 10px; text-align: center;\">"
-                + "<a href=\"https://onestopbank.netlify.app/\" style=\"text-decoration: none;\">"
-                + "<img src=\"https://onestopbank.netlify.app/assets/onestoplogo.jpg\" alt=\"OneStopBank\" style=\"height: 50px; margin-bottom: 10px;\">"
-                + "</a>" + "<h1 style=\"font-size: 1.8em; color: #3f51b5; margin: 10px 0;\">TEST</h1>" + "</div>"
-                + "<div style=\"padding: 20px;\">" + "<p style=\"font-size: 1.2em; color: #333;\">Hi, " + name + ",</p>"
-                + "<p style=\"font-size: 1em; color: #333;\">A login attempt was made on your account at:</p>"
-                + "<p style=\"font-size: 1em; color: #555;\">Time: <strong style=\"color: #3f51b5;\">" + loginTime
-                + "</strong></p>"
-                + "<p style=\"font-size: 1em; color: #333;\">If this was you, no further action is required. If you suspect any unauthorized access, please change your password immediately and contact our support team.</p>"
-                + "<p style=\"font-size: 1em; color: #555;\">Regards,<br />The Test Team</p>" + "</div>"
+                + "<img src=\"" + logoBase64 + "\" alt=\"Global Link Logo\" style=\"height: 50px; margin-bottom: 10px;\">"
+                + "<h1 style=\"font-size: 1.8em; color: #1a237e; margin: 10px 0;\">Global Link</h1>"
+                + "</div>"
+                + "<div style=\"padding: 20px;\">"
+                + "<p style=\"font-size: 1.2em; color: #333;\">Hi, " + name + ",</p>"
+                + "<p style=\"font-size: 1em; color: #333;\">" + message + "</p>"
+                + "</div>"
                 + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 20px 0;\" />"
                 + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
-                + "<p>Need help? Contact our support team:</p>"
-                + "<p>Email: <a href=\"mailto:lhktnt@gmail.com\" style=\"color: #3f51b5; text-decoration: none;\">lhktnt@gmail.com</a></p>"
-                + "<div style=\"margin-top: 20px;\">"
-                + "<p style=\"font-size: 1em; color: #333;\">Show your support here ❤️</p>"
-                + "</div>" + "</div>" + "</div>" + "</div>";
+                + "<p><strong>GlobalLink Media, LLC</strong></p>"
+                + "<p>131 Continental Dr, Suite 305, Newark, DE 19713, US</p>"
+                + "<p>Contact Us:</p>"
+                + "<p>WhatsApp: <a href=\"https://wa.me/84935857801\" style=\"color: #1a237e; text-decoration: none;\">+84 93 585 78 01</a></p>"
+                + "<p>Facebook: <a href=\"https://m.me/694261313775146\" style=\"color: #1a237e; text-decoration: none;\">m.me/694261313775146</a></p>"
+                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #1a237e; text-decoration: none;\">" + fromEmail + "</a></p>"
+                + "</div>"
+                + "</div>"
+                + "</div>";
+    }
+
+    // Các phương thức khác (getLoginEmailTemplate, getOtpLoginEmailTemplate, etc.) có thể được giữ nguyên hoặc điều chỉnh tương tự
+    // Ví dụ: Sử dụng getGeneralEmailTemplate cho các trường hợp cụ thể
+    @Override
+    public String getLoginEmailTemplate(String name, String loginTime) {
+        String message = "A login attempt was made on your account at: <br><strong style=\"color: #1a237e;\">" + loginTime
+                + "</strong><br>If this was you, no further action is required. If you suspect any unauthorized access, please contact our support team.";
+        return getGeneralEmailTemplate(name, message, "Login Attempt Notification");
     }
 
     @Override
     public String getOtpLoginEmailTemplate(String name, String otp) {
-
-        return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
-                + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
-                + "<div style=\"border-bottom: 1px solid #ddd; padding-bottom: 10px; text-align: center;\">"
-                + "<a href=\"https://onestopbank.netlify.app/\" style=\"text-decoration: none;\">"
-                + "<img src=\"https://onestopbank.netlify.app/assets/onestoplogo.jpg\" alt=\"OneStopBank\" style=\"height: 50px; margin-bottom: 10px;\">"
-                + "</a>" + "<h1 style=\"font-size: 1.8em; color: #3f51b5; margin: 10px 0;\">TEST</h1>" + "</div>"
-                + "<div style=\"padding: 20px;\">" + "<p style=\"font-size: 1.2em; color: #333;\">Hi, " + name + ",</p>"
-                + "<p style=\"font-size: 1em; color: #333;\">Thank you for choosing OneStopBank. Use the following OTP to complete your login procedures. The OTP is valid for "
-                + OTPService.OTP_EXPIRY_MINUTES + " minutes:</p>"
-                + "<h2 style=\"background: #3f51b5; margin: 20px 0; width: max-content; padding: 10px 20px; color: #fff; border-radius: 4px;\">"
-                + otp + "</h2>" + "<p style=\"font-size: 1em; color: #555;\">Regards,<br />The Test Team</p>"
-                + "</div>" + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 20px 0;\" />"
-                + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
-                + "<p>Need help? Contact our support team:</p>"
-                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #3f51b5; text-decoration: none;\">" + fromEmail + "</a></p>"
-                + "<div style=\"margin-top: 20px;\">"
-                + "<p style=\"font-size: 1em; color: #333;\">Show your support here ❤️</p>"
-                + "</div>" + "</div>" + "</div>" + "</div>";
+        String message = "Thank you for choosing Global Link. Use the following OTP to complete your login procedures. The OTP is valid for "
+                + OTPService.OTP_EXPIRY_MINUTES + " minutes: <br><h2 style=\"background: #1a237e; margin: 20px 0; width: max-content; padding: 10px 20px; color: #fff; border-radius: 4px;\">"
+                + otp + "</h2>";
+        return getGeneralEmailTemplate(name, message, "OTP for Login");
     }
 
     @Override
     public String getPasswordResetOtpRequestTemplate(String name, String otp) {
-        return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
-                + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
-                + "<div style=\"border-bottom: 1px solid #ddd; padding-bottom: 10px; text-align: center;\">"
-                + "<a href=\"https://onestopbank.netlify.app/\" style=\"text-decoration: none;\">"
-                + "<img src=\"https://onestopbank.netlify.app/assets/onestoplogo.jpg\" alt=\"OneStopBank\" style=\"height: 50px; margin-bottom: 10px;\">"
-                + "</a>" + "<h1 style=\"font-size: 1.8em; color: #3f51b5; margin: 10px 0;\">Password Reset Request</h1>" + "</div>"
-                + "<div style=\"padding: 20px;\">" + "<p style=\"font-size: 1.2em; color: #333;\">Hi, " + name + ",</p>"
-                + "<p style=\"font-size: 1em; color: #333;\">We received a request to reset your password. Use the following OTP to verify your identity. This OTP is valid for "
-                + OTPService.OTP_EXPIRY_MINUTES + " minutes:</p>"
-                + "<h2 style=\"background: #3f51b5; margin: 20px 0; width: max-content; padding: 10px 20px; color: #fff; border-radius: 4px;\">"
-                + otp + "</h2>"
-                + "<p style=\"font-size: 1em; color: #333;\">If you didn't request this password reset, please ignore this email or contact support immediately.</p>"
-                + "<p style=\"font-size: 1em; color: #555;\">Regards,<br />The Security Team</p>"
-                + "</div>"
-                + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 20px 0;\" />"
-                + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
-                + "<p>Need help? Contact our support team:</p>"
-                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #3f51b5; text-decoration: none;\">" + fromEmail + "</a></p>"
-                + "</div>" + "</div>" + "</div>";
+        String message = "We received a request to reset your password. Use the following OTP to verify your identity. This OTP is valid for "
+                + OTPService.OTP_EXPIRY_MINUTES + " minutes: <br><h2 style=\"background: #1a237e; margin: 20px 0; width: max-content; padding: 10px 20px; color: #fff; border-radius: 4px;\">"
+                + otp + "</h2><br>If you didn't request this password reset, please ignore this email or contact support immediately.";
+        return getGeneralEmailTemplate(name, message, "Password Reset Request");
     }
 
     @Override
     public String getPasswordResetSuccessTemplate(String name, String resetTime) {
-        return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
-                + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
-                + "<div style=\"border-bottom: 1px solid #ddd; padding-bottom: 10px; text-align: center;\">"
-                + "<a href=\"https://onestopbank.netlify.app/\" style=\"text-decoration: none;\">"
-                + "<img src=\"https://onestopbank.netlify.app/assets/onestoplogo.jpg\" alt=\"OneStopBank\" style=\"height: 50px; margin-bottom: 10px;\">"
-                + "</a>" + "<h1 style=\"font-size: 1.8em; color: #3f51b5; margin: 10px 0;\">Password Changed</h1>" + "</div>"
-                + "<div style=\"padding: 20px;\">" + "<p style=\"font-size: 1.2em; color: #333;\">Hi, " + name + ",</p>"
-                + "<p style=\"font-size: 1em; color: #333;\">Your password was successfully changed on:</p>"
-                + "<p style=\"font-size: 1em; color: #555;\">Time: <strong style=\"color: #3f51b5;\">" + resetTime + "</strong></p>"
-                + "<p style=\"font-size: 1em; color: #333;\">If you didn't make this change, please contact our support team immediately.</p>"
-                + "<p style=\"font-size: 1em; color: #555;\">For security reasons, we recommend:</p>"
-                + "<ul style=\"font-size: 1em; color: #555; padding-left: 20px;\">"
-                + "<li>Using a strong, unique password</li>"
-                + "<li>Enabling two-factor authentication</li>"
-                + "<li>Regularly updating your password</li>"
-                + "</ul>"
-                + "<p style=\"font-size: 1em; color: #555;\">Regards,<br />The Security Team</p>"
-                + "</div>"
-                + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 20px 0;\" />"
-                + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
-                + "<p>Need help? Contact our support team:</p>"
-                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #3f51b5; text-decoration: none;\">" + fromEmail + "</a></p>"
-                + "</div>" + "</div>" + "</div>";
+        String message = "Your password was successfully changed on: <br><strong style=\"color: #1a237e;\">" + resetTime
+                + "</strong><br>If you didn't make this change, please contact our support team immediately. For security reasons, we recommend using a strong, unique password and enabling two-factor authentication.";
+        return getGeneralEmailTemplate(name, message, "Password Changed");
     }
 
     @Override
-    public String getEmailOrderCompleteTemplate(String name,
-                                                String transactionCode,
-                                                Double amountInCoin,
-                                                Date time,
-                                                String transactionStatus,
-                                                String ticketProductName,
-                                                Integer quantity,
-                                                String ticketProductItemCode,
-                                                List<TicketProductInfo> randomInfos) {
-
+    public String getEmailOrderCompleteTemplate(String name, String transactionCode, Double amountInCoin, Date time, String transactionStatus, String ticketProductName, Integer quantity, String ticketProductItemCode, List<TicketProductInfo> randomInfos) {
         StringBuilder builder = new StringBuilder();
-
         builder.append("<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">")
                 .append("<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">")
-                .append("<div style=\"text-align: center; padding-bottom: 20px;\">")
-                .append("<img src=\"https://cdn-icons-png.flaticon.com/512/845/845646.png\" alt=\"Success\" style=\"width: 80px;\">")
-                .append("<h1 style=\"font-size: 1.8em; color: #2ecc71; margin: 20px 0;\">ORDER CONFIRMATION SUCCESS!</h1>")
+                .append("<div style=\"border-bottom: 1px solid #ddd; padding-bottom: 10px; text-align: center;\">")
+                .append("<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==\" alt=\"Global Link Logo\" style=\"height: 50px; margin-bottom: 10px;\">")
+                .append("<h1 style=\"font-size: 1.8em; color: #1a237e; margin: 10px 0;\">Global Link</h1>")
                 .append("</div>")
-
                 .append("<div style=\"padding: 0 20px; font-size: 1em; color: #333;\">")
                 .append("<p><strong>Hi ").append(name).append(",</strong></p>")
                 .append("<p>Your order confirmation: </p>")
@@ -202,27 +153,29 @@ public class EmailServiceImpl implements EmailService {
             builder.append("</pre></div>");
         }
 
-        builder.append("<p>Thanks for choosing our service.</p>")
+        builder.append("<p>Thanks for choosing Global Link.</p>")
                 .append("</div>")
                 .append("<hr style=\"border: none; border-top: 1px solid #ddd; margin: 30px 0;\" />")
                 .append("<div style=\"text-align: center; font-size: 0.9em; color: #888;\">")
-                .append("<p>📧 Any confusion please contact by this email:</p>")
-                .append("<p>Email: <a href=\"mailto:").append(fromEmail).append("\" style=\"color: #3f51b5; text-decoration: none;\">").append(fromEmail).append("</a></p>")
+                .append("<p><strong>GlobalLink Media, LLC</strong></p>")
+                .append("<p>131 Continental Dr, Suite 305, Newark, DE 19713, US</p>")
+                .append("<p>Contact Us:</p>")
+                .append("<p>WhatsApp: <a href=\"https://wa.me/84935857801\" style=\"color: #1a237e; text-decoration: none;\">+84 93 585 78 01</a></p>")
+                .append("<p>Facebook: <a href=\"https://m.me/694261313775146\" style=\"color: #1a237e; text-decoration: none;\">m.me/694261313775146</a></p>")
+                .append("<p>Email: <a href=\"mailto:").append(fromEmail).append("\" style=\"color: #1a237e; text-decoration: none;\">").append(fromEmail).append("</a></p>")
                 .append("</div>")
                 .append("</div></div>");
 
         return builder.toString();
     }
 
-
-
     @Override
     public String getEmailApologizeForBalanceErrorTemplate(String name, String transactionCode, double amount, Date correctionTime) {
         return "<div style=\"font-family: Helvetica, Arial, sans-serif; min-width: 320px; max-width: 1000px; margin: 0 auto; overflow: auto; line-height: 2; background-color: #f1f1f1; padding: 20px;\">"
                 + "<div style=\"margin: 50px auto; width: 100%; max-width: 600px; padding: 20px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);\">"
-                + "<div style=\"text-align: center; padding-bottom: 20px;\">"
-                + "<img src=\"https://cdn-icons-png.flaticon.com/512/564/564619.png\" alt=\"Error\" style=\"width: 80px;\">"
-                + "<h1 style=\"font-size: 1.8em; color: #e74c3c; margin: 20px 0;\">APOLOGIES FOR THE TOP-UP ISSUE</h1>"
+                + "<div style=\"border-bottom: 1px solid #ddd; padding-bottom: 10px; text-align: center;\">"
+                + "<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==\" alt=\"Global Link Logo\" style=\"height: 50px; margin-bottom: 10px;\">"
+                + "<h1 style=\"font-size: 1.8em; color: #1a237e; margin: 10px 0;\">Global Link</h1>"
                 + "</div>"
                 + "<div style=\"padding: 0 20px; font-size: 1em; color: #333;\">"
                 + "<p><strong>Hi " + name + ",</strong></p>"
@@ -234,13 +187,15 @@ public class EmailServiceImpl implements EmailService {
                 + "<li><strong>Correction time: </strong> " + correctionTime + "</li>"
                 + "</ul>"
                 + "<p>Thank you for your patience and understanding. If you have any further concerns, feel free to contact our support team.</p>"
-                + "<div style=\"text-align: center; margin-top: 30px;\">"
-                + "</div>"
                 + "</div>"
                 + "<hr style=\"border: none; border-top: 1px solid #ddd; margin: 30px 0;\" />"
                 + "<div style=\"text-align: center; font-size: 0.9em; color: #888;\">"
-                + "<p>📧 For support, contact us via email:</p>"
-                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #3f51b5; text-decoration: none;\">" + fromEmail + "</a></p>"
+                + "<p><strong>GlobalLink Media, LLC</strong></p>"
+                + "<p>131 Continental Dr, Suite 305, Newark, DE 19713, US</p>"
+                + "<p>Contact Us:</p>"
+                + "<p>WhatsApp: <a href=\"https://wa.me/84935857801\" style=\"color: #1a237e; text-decoration: none;\">+84 93 585 78 01</a></p>"
+                + "<p>Facebook: <a href=\"https://m.me/694261313775146\" style=\"color: #1a237e; text-decoration: none;\">m.me/694261313775146</a></p>"
+                + "<p>Email: <a href=\"mailto:" + fromEmail + "\" style=\"color: #1a237e; text-decoration: none;\">" + fromEmail + "</a></p>"
                 + "</div>"
                 + "</div>"
                 + "</div>";
